@@ -1,0 +1,151 @@
+# Contrato do Serviço de Monitoramento
+version: 1.0.0
+description: Contrato para serviços de monitoramento
+
+service:
+  name: MonitoringService
+  provider: Custom
+  version: 1.0.0
+
+metrics:
+  performance:
+    response_time:
+      type: gauge
+      unit: milliseconds
+      description: Tempo de resposta das requisições
+      thresholds:
+        warning: 2000
+        critical: 5000
+    memory_usage:
+      type: gauge
+      unit: percentage
+      description: Uso de memória
+      thresholds:
+        warning: 70
+        critical: 85
+    database_queries:
+      type: counter
+      description: Número de queries executadas
+    cache_hit_rate:
+      type: gauge
+      unit: percentage
+      description: Taxa de acerto do cache
+      thresholds:
+        warning: 80
+        critical: 60
+
+  business:
+    contact_submissions:
+      type: counter
+      description: Número de contatos enviados
+    page_views:
+      type: counter
+      description: Número de visualizações de página
+    user_sessions:
+      type: counter
+      description: Número de sessões de usuário
+    error_rate:
+      type: gauge
+      unit: percentage
+      description: Taxa de erro
+      thresholds:
+        warning: 5
+        critical: 10
+
+  infrastructure:
+    disk_usage:
+      type: gauge
+      unit: percentage
+      description: Uso de disco
+      thresholds:
+        warning: 80
+        critical: 90
+    cpu_usage:
+      type: gauge
+      unit: percentage
+      description: Uso de CPU
+      thresholds:
+        warning: 70
+        critical: 85
+    queue_jobs:
+      type: counter
+      description: Número de jobs na fila
+    external_services:
+      type: gauge
+      unit: percentage
+      description: Disponibilidade de serviços externos
+      thresholds:
+        warning: 95
+        critical: 90
+
+alerts:
+  channels:
+    email:
+      type: email
+      recipients:
+        - admin@lapidus.com
+        - dev@lapidus.com
+    slack:
+      type: webhook
+      url: "https://hooks.slack.com/services/..."
+    sms:
+      type: sms
+      numbers:
+        - "+5511999999999"
+
+  rules:
+    high_error_rate:
+      condition: "error_rate > 10"
+      severity: critical
+      channels: [email, slack, sms]
+    slow_response_time:
+      condition: "response_time > 5000"
+      severity: warning
+      channels: [email, slack]
+    high_memory_usage:
+      condition: "memory_usage > 85"
+      severity: critical
+      channels: [email, slack, sms]
+    low_cache_hit_rate:
+      condition: "cache_hit_rate < 60"
+      severity: warning
+      channels: [email, slack]
+
+events:
+  application_started:
+    description: Aplicação iniciada
+    properties:
+      version:
+        type: string
+      environment:
+        type: string
+      timestamp:
+        type: string
+        format: date-time
+
+  error_occurred:
+    description: Erro ocorreu
+    properties:
+      error:
+        type: string
+      stack_trace:
+        type: string
+      context:
+        type: object
+      timestamp:
+        type: string
+        format: date-time
+
+  service_unavailable:
+    description: Serviço indisponível
+    properties:
+      service:
+        type: string
+      error:
+        type: string
+      duration:
+        type: integer
+        unit: seconds
+      timestamp:
+        type: string
+        format: date-time 

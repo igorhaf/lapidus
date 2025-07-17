@@ -1,0 +1,431 @@
+openapi: 3.0.3
+info:
+  title: API Home - Lapidus
+  description: API para o módulo Home do sistema Lapidus
+  version: 1.0.0
+  contact:
+    name: Equipe de Desenvolvimento
+    email: dev@lapidus.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost/api/v1
+    description: Servidor de Desenvolvimento
+  - url: https://api.lapidus.com/api/v1
+    description: Servidor de Produção
+
+paths:
+  /pagina-inicial:
+    get:
+      summary: Obter dados da página inicial
+      description: Retorna dados da página inicial incluindo estatísticas e informações do usuário
+      operationId: getHomePageData
+      tags:
+        - Home
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: include_stats
+          in: query
+          description: Incluir estatísticas detalhadas
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: include_analytics
+          in: query
+          description: Incluir dados de analytics
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Dados da página inicial obtidos com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomePageResponse'
+              examples:
+                success:
+                  summary: Resposta de sucesso
+                  value:
+                    data:
+                      message: "Página inicial carregada com sucesso"
+                      module: "home"
+                      timestamp: "2024-01-15T10:30:00Z"
+                      user:
+                        id: 1
+                        name: "João Silva"
+                        email: "joao@example.com"
+                        is_guest: false
+                      metadata:
+                        analytics:
+                          is_bot: false
+                          is_mobile: true
+                          user_type: "registered"
+                          session_quality: 0.85
+                        stats:
+                          total_views: 1250
+                          recent_views: 45
+                          unique_visitors: 890
+                          average_session_duration: 180
+                          bounce_rate: 0.25
+                          last_updated: "2024-01-15T10:30:00Z"
+                        page_view_id: "view_abc123"
+                        cached: true
+                    meta:
+                      status: "success"
+                      message: null
+                      timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Muitas requisições
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pagina-inicial/contact:
+    post:
+      summary: Enviar formulário de contato
+      description: Processa e envia formulário de contato da página inicial
+      operationId: submitContactForm
+      tags:
+        - Home
+        - Contact
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactFormRequest'
+            examples:
+              basic_contact:
+                summary: Contato básico
+                value:
+                  name: "Maria Silva"
+                  email: "maria@example.com"
+                  phone: "(11) 99999-9999"
+                  subject: "Dúvida sobre serviços"
+                  message: "Gostaria de saber mais sobre os serviços oferecidos."
+                  preferred_contact: "email"
+                  newsletter: true
+              urgent_contact:
+                summary: Contato urgente
+                value:
+                  name: "João Urgente"
+                  email: "joao.urgente@example.com"
+                  phone: "(11) 88888-8888"
+                  subject: "PROBLEMA CRÍTICO"
+                  message: "Estou enfrentando um problema crítico que precisa de atenção imediata!"
+                  preferred_contact: "whatsapp"
+                  newsletter: false
+      responses:
+        '201':
+          description: Formulário enviado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactFormResponse'
+              examples:
+                success:
+                  summary: Contato enviado com sucesso
+                  value:
+                    data:
+                      success: true
+                      message: "Mensagem enviada com sucesso! Entraremos em contato em breve."
+                      contact_id: "contact_xyz789"
+                      timestamp: "2024-01-15T10:30:00Z"
+                      metadata:
+                        is_urgent: false
+                        preferred_contact: "email"
+                        newsletter: true
+                    meta:
+                      status: "success"
+                      message: null
+                      timestamp: "2024-01-15T10:30:00Z"
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '429':
+          description: Muitas requisições
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    HomePageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Página inicial carregada com sucesso"
+            module:
+              type: string
+              example: "home"
+            timestamp:
+              type: string
+              format: date-time
+              example: "2024-01-15T10:30:00Z"
+            user:
+              $ref: '#/components/schemas/User'
+            metadata:
+              $ref: '#/components/schemas/HomePageMetadata'
+        meta:
+          $ref: '#/components/schemas/MetaResponse'
+
+    ContactFormRequest:
+      type: object
+      required:
+        - name
+        - email
+        - subject
+        - message
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: "joao@example.com"
+        phone:
+          type: string
+          maxLength: 20
+          pattern: '^(\+55\s?)?(\(?\d{2}\)?\s?)?(\d{4,5}-?\d{4})$'
+          example: "(11) 99999-9999"
+        subject:
+          type: string
+          minLength: 3
+          maxLength: 200
+          example: "Dúvida sobre serviços"
+        message:
+          type: string
+          minLength: 10
+          maxLength: 1000
+          example: "Gostaria de saber mais sobre os serviços oferecidos pela empresa."
+        preferred_contact:
+          type: string
+          enum: [email, phone, whatsapp]
+          example: "email"
+        newsletter:
+          type: boolean
+          default: false
+          example: true
+
+    ContactFormResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            message:
+              type: string
+              example: "Mensagem enviada com sucesso! Entraremos em contato em breve."
+            contact_id:
+              type: string
+              example: "contact_xyz789"
+            timestamp:
+              type: string
+              format: date-time
+              example: "2024-01-15T10:30:00Z"
+            metadata:
+              type: object
+              properties:
+                is_urgent:
+                  type: boolean
+                  example: false
+                preferred_contact:
+                  type: string
+                  example: "email"
+                newsletter:
+                  type: boolean
+                  example: true
+        meta:
+          $ref: '#/components/schemas/MetaResponse'
+
+    User:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          example: "joao@example.com"
+        is_guest:
+          type: boolean
+          example: false
+
+    HomePageMetadata:
+      type: object
+      properties:
+        analytics:
+          type: object
+          properties:
+            is_bot:
+              type: boolean
+              example: false
+            is_mobile:
+              type: boolean
+              example: true
+            user_type:
+              type: string
+              enum: [guest, registered, admin]
+              example: "registered"
+            session_quality:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+              example: 0.85
+        stats:
+          type: object
+          properties:
+            total_views:
+              type: integer
+              example: 1250
+            recent_views:
+              type: integer
+              example: 45
+            unique_visitors:
+              type: integer
+              example: 890
+            average_session_duration:
+              type: integer
+              example: 180
+            bounce_rate:
+              type: number
+              format: float
+              example: 0.25
+            last_updated:
+              type: string
+              format: date-time
+              example: "2024-01-15T10:30:00Z"
+        page_view_id:
+          type: string
+          example: "view_abc123"
+        cached:
+          type: boolean
+          example: true
+
+    MetaResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+          example: "success"
+        message:
+          type: string
+          nullable: true
+          example: null
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Erro interno do servidor"
+            errors:
+              type: object
+              nullable: true
+            status:
+              type: integer
+              example: 500
+            timestamp:
+              type: string
+              format: date-time
+              example: "2024-01-15T10:30:00Z"
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Dados de entrada inválidos"
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+              example:
+                email:
+                  - "O e-mail deve ser um endereço válido"
+                phone:
+                  - "O número de telefone deve estar em formato válido"
+            status:
+              type: integer
+              example: 400
+            timestamp:
+              type: string
+              format: date-time
+              example: "2024-01-15T10:30:00Z"
+
+tags:
+  - name: Home
+    description: Operações relacionadas à página inicial
+  - name: Contact
+    description: Operações relacionadas a formulários de contato
