@@ -3,14 +3,15 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Domain\Foo\Repositories\FooRepositoryInterface;
-use App\Infra\Repositories\Eloquent\FooRepository;
+// Exemplo: use App\Domain\Home\Interfaces\Repositories\HomeRepositoryInterface;
+// Exemplo: use App\Infra\Repositories\Eloquent\HomeRepository;
 
 class RepositoryServiceProvider extends ServiceProvider {
     public function register() {
-        $this->app->bind(
-            FooRepositoryInterface::class,
-            FooRepository::class
-        );
+        // Exemplo de binding real:
+        // $this->app->bind(
+        //     HomeRepositoryInterface::class,
+        //     HomeRepository::class
+        // );
     }
 }
