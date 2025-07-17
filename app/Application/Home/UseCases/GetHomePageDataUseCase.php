@@ -5,43 +5,40 @@ namespace App\Application\Home\UseCases;
 use App\Application\Home\DTOs\GetHomePageDataInputDTO;
 use App\Application\Home\DTOs\GetHomePageDataOutputDTO;
 use App\Domain\Home\Interfaces\Repositories\HomeRepositoryInterface;
-use App\Domain\Home\Entities\HomePageView;
-use App\Domain\Home\ValueObjects\UserId;
-use App\Domain\Home\ValueObjects\ViewTimestamp;
-use App\Domain\Home\Events\HomePageViewed;
-use Illuminate\Support\Facades\Event;
+use App\Domain\Home\Actions\RecordPageViewAction;
+use App\Domain\Home\Actions\CalculatePageStatsAction;
+use App\Domain\Home\Services\PageAnalyticsService;
 
 /**
  * UseCase para obter dados da página inicial
- * Segue padrões de Clean Architecture
+ * Usa Actions e Services da camada Domain
  */
 class GetHomePageDataUseCase
 {
     public function __construct(
-        private readonly HomeRepositoryInterface $homeRepository
+        private readonly HomeRepositoryInterface $homeRepository,
+        private readonly RecordPageViewAction $recordPageViewAction,
+        private readonly CalculatePageStatsAction $calculatePageStatsAction,
+        private readonly PageAnalyticsService $pageAnalyticsService
     ) {}
 
     public function __invoke(GetHomePageDataInputDTO $input): GetHomePageDataOutputDTO
     {
-        // Criar entidade de domínio
-        $pageView = new HomePageView(
-            userId: new UserId($input->userId ?? 0),
-            viewedAt: new ViewTimestamp(new \DateTimeImmutable()),
-            userIp: $input->userIp,
-            userAgent: $input->userAgent
+        // Usar Action para registrar visualização
+        $pageView = $this->recordPageViewAction->__invoke(
+            $input->userId ?? 0,
+            $input->userIp,
+            $input->userAgent
         );
 
         // Salvar no repositório
         $this->homeRepository->savePageView($pageView);
 
-        // Disparar evento de domínio
-        Event::dispatch(new HomePageViewed(
-            $pageView->getUserId()->getValue(),
-            $pageView->getViewedAt()->getValue()
-        ));
+        // Analisar a visualização
+        $analytics = $this->pageAnalyticsService->analyzePageView($pageView);
 
-        // Obter estatísticas
-        $stats = $this->homeRepository->getPageStats();
+        // Calcular estatísticas
+        $stats = $this->calculatePageStatsAction->__invoke();
 
         // Retornar DTO de saída
         return new GetHomePageDataOutputDTO(
@@ -53,9 +50,9 @@ class GetHomePageDataUseCase
                 'is_guest' => false
             ],
             metadata: [
-                'total_views' => $stats['total_views'] ?? 0,
-                'recent_views' => $stats['recent_views'] ?? 0,
-                'user_ip' => $pageView->getUserIp(),
+                'analytics' => $analytics,
+                'stats' => $stats,
+                'page_view_id' => $pageView->getId()->getValue(),
             ]
         );
     }
