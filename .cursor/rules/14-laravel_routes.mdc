@@ -1,0 +1,41 @@
+---
+description: Define rotas REST e SSR para o módulo, seguindo convenções Laravel e Inertia
+globs:
+  - "app/Http/Controllers/Api/V1/**/*.php"
+  - "routes/api.php"
+  - "routes/web.php"
+alwaysApply: false
+---
+
+ACTION: ROUTES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR phase: routes e module: <Module>
+
+STEP 2 – ROUTE_GROUP_SETUP  
+• CRIAR grupo de rotas com prefixo `/api/v1/<module_slug>`  
+• ADICIONAR middlewares: auth:sanctum, throttle:api (quando aplicável)
+
+STEP 3 – API_RESOURCE  
+• DEFINIR `Route::apiResource('<module_slug>', <Module>Controller::class)`  
+• SE necessário, CRIAR rotas adicionais como relações ou batch
+
+STEP 4 – SSR_ROUTES  
+• NO web.php, DEFINIR rota SSR via Inertia para páginas do módulo  
+• EXEMPLO: `Route::get('/<module_slug>', fn() => Inertia::render(...))`
+
+STEP 5 – ROUTE_NAMING  
+• GARANTIR nomes consistentes: `<module>.<action>`  
+• VALIDAR convenção snake_case ou kebab-case conforme padrão
+
+STEP 6 – DOCUMENTATION  
+• GERAR `ROUTES_<Module>.md` em docs/impl/routes/ via template IMPLEMENTATION  
+• INCLUIR resumo de rotas/API/SSR
+
+STEP 7 – GIT_COMMIT  
+• `git add routes api.php web.php docs/impl/routes/ROUTES_<Module>.md`  
+• `git commit -m "feat(<Module>): routes"`
+
+EXPECTED_OUTPUT:  
+Markdown com blocos das etapas enumeradas acima, sem código-fonte, pronto para ser usado na fase `routes`.

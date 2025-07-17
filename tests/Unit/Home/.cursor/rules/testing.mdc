@@ -1,0 +1,33 @@
+---
+description: Regra de testes unitários para o módulo Home — valida cobertura e uso de factories PT‑BR
+globs:
+  - "tests/Unit/Home/**/*.php"
+alwaysApply: false
+---
+
+ACTION: TESTING
+
+STEP 1 – CONTEXT_CHECK  
+• VALIDAR presença do arquivo `PROJECT_CONTEXT.md` no prompt  
+• VALIDAR que o módulo especificado no prompt seja “Home”  
+
+STEP 2 – FACTORY_USAGE  
+• GARANTIR que cada entidade importada em `tests/Unit/Home/` tenha uma factory correspondente em `database/factories/`  
+• ASSEGURAR que os dados de teste usem conteúdo PT‑BR (ex.: nomes, ruídos realistas)  
+
+STEP 3 – COVERAGE_MINIMUM  
+• EXIGIR cobertura mínima de **80 % de branches** para modelos, serviços ou casos de uso  
+• PARA cada teste unitário, incluí assertivas específicas de valores esperados e casos de erro  
+
+STEP 4 – CLEANUP_AND_TEARDOWN  
+• CONFIRMAR que o banco em memória ou mocks sejam resetados ao final de cada teste (ex.: `setUp()`/`tearDown()` corretos)  
+
+STEP 5 – DOC_GENERATION  
+• GERAR `TESTING_Home.md` em `docs/impl/tests/` usando template IMPLEMENTATION (resumo, arquivos, como executar, status cobertura)  
+
+STEP 6 – GIT_COMMIT  
+• GIT ADD de `tests/Unit/Home/**` e `docs/impl/tests/TESTING_Home.md`  
+• GIT COMMIT com mensagem: `test/docs(Home): coverage & docs`  
+
+EXPECTED_OUTPUT:  
+Markdown contendo instructions numeradas conforme acima, sem gerar código-fonte, pronto para colar no chat-phase “18-tests” do orquestrador.

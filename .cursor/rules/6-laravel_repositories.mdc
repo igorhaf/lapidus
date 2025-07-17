@@ -1,0 +1,37 @@
+---
+description: Cria contratos e implementações de repositório para módulos Laravel
+globs: ["app/Domain/**/Interfaces/Repositories/*.php", "app/Infra/Repositories/Eloquent/*.php"]
+alwaysApply: false
+---
+
+ACTION: REPOSITORIES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para as convenções gerais  
+• VALIDAR `phase: repositories` e `module: <Module>`
+
+STEP 2 – INTERFACE_CHECK  
+• IDENTIFICAR contratos existentes em `app/Domain/<Module>/Interfaces/Repositories/`  
+• PARA CADA contrato sem implementação → criar stub correspondente
+
+STEP 3 – IMPLEMENTATION_GENERATION  
+• GERAR classe Eloquent dentro de `app/Infra/Repositories/Eloquent/`, implementando todos os métodos do contrato  
+• GARANTIR uso de QueryBuilder/Eloquent conforme convenções do projeto
+
+STEP 4 – SERVICE_PROVIDER_BINDING  
+• NO `app/Providers/RepositoryServiceProvider.php`, adicionar binding:  
+  `Domain\...Interfaces\Repositories\<RepoInterface>::class => Infra\Repositories\Eloquent\<RepoImplementation>::class`
+
+STEP 5 – DOCUMENTATION  
+• GERAR `REPOSITORIES_<Module>.md` em `docs/impl/repositories/` com resumo de:  
+  - interfaces criadas  
+  - classes implementadas  
+  - bindings feitos
+
+STEP 6 – GIT_COMMIT  
+• COMANDO:  
+  `git add app/Domain/<Module>/Interfaces/Repositories app/Infra/Repositories/Eloquent docs/impl/repositories/`  
+  `git commit -m "feat(<Module>): repositories"`
+
+EXPECTED_OUTPUT:  
+Markdown estruturado em blocos com instruções por passo, incluindo comandos git, pronto para colar no chat da fase repositories.

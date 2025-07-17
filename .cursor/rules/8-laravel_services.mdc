@@ -1,0 +1,33 @@
+---
+description: Criação de Domain Services stateless para regras de negócio reutilizáveis
+globs:
+  - app/Domain/*/Services/**
+alwaysApply: false
+---
+
+ACTION: DOMAIN_SERVICE_GENERATION
+
+STEP 1: IDENTIFICATION
+- IDENTIFY multi-entity or cross-cutting rules that do not pertain to a single entity.
+- ENSURE that the logic is purely domain-driven, without dependencies on infrastructure or Laravel components.
+- CHECK if the behavior encapsulates policies or decisions better modeled as services.
+
+STEP 2: STRUCTURE
+- DEFINE service classes inside `app/Domain/<Module>/Services/` following the `SomethingService` naming convention.
+- IMPLEMENT stateless methods (no internal state or side effects).
+- USE injected interfaces only — never depend directly on Eloquent, HTTP, or other Laravel components.
+- IF helper logic is shared, EXTRACT into Traits or helper classes in the same namespace.
+
+STEP 3: CONTRACTS (optional)
+- IF service requires abstraction, CREATE interface under `app/Domain/<Module>/Interfaces/Services/`.
+- DEFINE signatures for service behavior to allow mocking/testing and future replacement.
+
+STEP 4: TESTING
+- CREATE unit test files in `tests/Unit/<Module>/Services/`.
+- COVER all public methods using realistic domain data.
+
+EXPECTED_OUTPUT:
+A fully decoupled, stateless Domain Service placed in `app/Domain/<Module>/Services`, tested and ready to be orchestrated via UseCases.
+
+Comando git:
+git add app/Domain/<Module>/Services tests/Unit/<Module>/Services && git commit -m "feat(<Module>): domain services"

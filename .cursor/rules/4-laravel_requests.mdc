@@ -1,0 +1,30 @@
+---
+description: "Gera as classes Store e Update FormRequest com validações e prepareForValidation se necessário"
+globs: ["app/Http/Requests/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: FORM_REQUESTS
+
+STEP 1 – CONTEXT_LOAD  
+• Validar que `phase: requests` e `module: <Module>` foram corretamente identificados  
+• Ler `PROJECT_CONTEXT.md` e convenções de pasta
+
+STEP 2 – CREATE_REQUEST_CLASSES  
+• Gerar `Store<Module>Request` e `Update<Module>Request` em `app/Http/Requests/<Module>/`  
+• Adicionar métodos `rules()` com validação completa para campos obrigatórios e formatos  
+• Incluir `authorize()` com retorno `true` ou lógica de autorização básica
+
+STEP 3 – CONDITIONAL_RULES_LOGIC  
+• Se campo slug, email ou data existirem → adicionar `prepareForValidation()` com lógica de formatação  
+• Se houver enum, aplicar validação com `Rule::in([...Enum::cases()])`
+
+STEP 4 – DOC_GENERATION  
+• Gerar arquivo `REQUESTS_<Module>.md` em `docs/impl/requests/` usando o template IMPLEMENTATION
+
+STEP 5 – GIT_COMMIT  
+• `git add app/Http/Requests/<Module>/*.php docs/impl/requests/REQUESTS_<Module>.md`  
+• `git commit -m "feat(<Module>): form requests"`
+
+EXPECTED_OUTPUT:  
+Markdown contendo os passos acima numerados e o comando Git, sem gerar código-fonte, pronto para execução pela fase `requests`.

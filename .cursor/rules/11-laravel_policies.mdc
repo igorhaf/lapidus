@@ -1,0 +1,42 @@
+---
+description: Geração de Policies para o módulo
+globs:
+  - app/Policies/**
+alwaysApply: false
+---
+
+ACTION: POLICY_DEFINITION
+
+STEP 1: CONTEXT_ANALYSIS
+
+- READ the PROJECT_CONTEXT.md for conventions and authorization logic.
+- READ the blueprint and usecases of the module to understand domain rules.
+- IDENTIFY what resources require access control.
+
+STEP 2: POLICY_STRUCTURE
+
+- CREATE a Policy class under `app/Policies/<Module>Policy.php`.
+- IMPLEMENT methods: `view`, `create`, `update`, `delete`, `restore`, `forceDelete`.
+- APPLY role-based + ownership-based checks in methods.
+- USE `Gate::before` if `isSuperAdmin` shortcut is needed.
+
+STEP 3: SERVICE_PROVIDER_REGISTRATION
+
+- REGISTER the Policy inside `AuthServiceProvider`.
+
+STEP 4: ALIGN_WITH_DOMAIN
+
+- IF domain has permission boundaries, SYNCHRONIZE logic with Domain Services.
+- IF rules vary by tenant or team context, EXTRACT reusable rules as traits.
+
+STEP 5: VALIDATION_AND_TESTS
+
+- VERIFY consistency with FormRequest + UseCases.
+- CREATE unit tests under `tests/Unit/<Module>/Policies`.
+
+EXPECTED_OUTPUT:
+
+A Laravel Policy fully integrated with the domain and respecting layered authorization logic, ready to be injected in route/middleware or controller authorization calls.
+
+Comando git:
+git add app/Policies tests/Unit && git commit -m "feat(<Module>): policies"

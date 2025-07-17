@@ -1,0 +1,37 @@
+---
+description: Cria blueprint inicial do módulo (visão, ERD, user‑stories, roadmap)
+globs:
+alwaysApply: false
+---
+
+ACTION: BLUEPRINT
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR que a mensagem contenha `phase: blueprint` e `module: <NomeModulo>`
+
+STEP 2 – DEFINE_VIEW  
+• DESCREVER a visão do módulo: problema, objetivos e stakeholders
+
+STEP 3 – ERD_MODEL  
+• GERAR ERD textual com tabelas em snake_case, PKs, FKs, índices
+
+STEP 4 – USER_STORIES  
+• LISTAR pelo menos 3 user stories no formato “Como <persona>, quero <ação>, para <valor>”
+
+STEP 5 – ROADMAP  
+• MONTAR roadmap semestral (v0.1 → v0.5) com KPIs
+
+STEP 6 – ENUMS_IDENTIFICATION  
+• LISTAR possíveis Enums / ValueObjects necessários (ex.: status, categorias)
+
+STEP 7 – DOC_GENERATION  
+• GERAR arquivo `docs/impl/blueprint/BLUEPRINT_<Module>.md`  
+  usando template IMPLEMENTATION (resumo, arquivos, governança, como testar, status)
+
+STEP 8 – GIT_COMMIT  
+• INCLUIR `docs/<Module>.md` e o arquivo em `docs/impl/blueprint/`  
+• COMMIT: `git commit -m "docs: blueprint <Module>"`
+
+EXPECTED_OUTPUT:  
+Markdown com os passos acima numerados, sem gerar código-fonte, pronto para ser colado no canal/fase blueprint.

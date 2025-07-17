@@ -1,0 +1,38 @@
+---
+description: Define Domain Events e Listeners conforme padrão de fluxo
+globs:
+  ["app/Domain/**/Events/*.php", "app/Listeners/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: DOMAIN_EVENTS_LISTENERS
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR phase: events e module: <Module>  
+
+STEP 2 – IDENTIFY_EVENTS  
+• LISTAR eventos no diretório Domain/<Module>/Events  
+• PARA cada evento, verificar necessidade de listeners ou jobs  
+
+STEP 3 – CREATE_LISTENERS  
+• GERAR Listener para cada evento relevante dentro de app/Listeners  
+• Assegurar assinatura correta (`handle(Event $event)`) e tipagem  
+
+STEP 4 – REGISTER_BINDINGS  
+• ABRIR EventServiceProvider  
+• REGISTRAR evento → listener no array `$listen`  
+
+STEP 5 – TEST_STRATEGY  
+• SUGERIR criação de testes (Unit ou Feature) para cada listener  
+
+STEP 6 – DOC_GENERATION  
+• GERAR `EVENTS_<Module>.md` em `docs/impl/events/`  
+• Incluir resumo: eventos, listeners, localização, como testar  
+
+STEP 7 – GIT_COMMIT  
+• `git add app/Domain/<Module>/Events app/Listeners docs/impl/events/EVENTS_<Module>.md`  
+• `git commit -m "feat(<Module>): events and listeners"`  
+
+EXPECTED_OUTPUT:  
+Saída em markdown com todos os passos numerados, clareza sobre o que gerar em código, e o comando Git pronto para uso.  

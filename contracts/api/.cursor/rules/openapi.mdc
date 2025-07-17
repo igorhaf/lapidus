@@ -1,0 +1,38 @@
+---
+description: Gera e valida regras para contratos OpenAPI por módulo
+globs: ["contracts/api/**/*.openapi.yaml", "contracts/api/**/*.yaml", "contracts/api/**/*.json"]
+alwaysApply: false
+---
+
+ACTION: OPENAPI
+
+STEP 1 – CONTEXT_LOAD  
+• VALIDAR `phase: docs` ou `phase: openapi` e `module: <NomeModulo>`  
+• CARREGAR PROJECT_CONTEXT.md para garantir alinhamento com padrões de API  
+
+STEP 2 – SPEC_DISCOVERY  
+• IDENTIFICAR o arquivo OpenAPI correspondente em `contracts/api/<modulo>.openapi.yaml` ou `.yaml`  
+• VALIDAR versão do OpenAPI (v3 ou v3.1)
+
+STEP 3 – NAMING_AND_VERSIONING  
+• GARANTIR que `info.title` e `paths` usem nomenclatura consistente (PascalCase ou snake_case conforme convenção)  
+• VALIDAR `info.version` e usar `x-spec-id` caso existam múltiplos serviços
+
+STEP 4 – PATHS_AND_OPERATIONS  
+• PARA CADA path: verificar `operationId` único, parâmetros documentados e descrições claras  
+• CONFIRMAR uso de schemas referenciados usando `$ref` corretamente
+
+STEP 5 – SCHEMAS_VALIDATION  
+• CHECAR se todos os schemas/objetos usados estão definidos em `components/schemas`  
+• VALIDAR exemplos (`example` ou `examples`) para requests e responses principais
+
+STEP 6 – GENERATE_DOC  
+• GERAR `OPENAPI_<Module>.md` em `docs/impl/docs/` com resumo: title, version, principais endpoints e exemplos  
+• SE README_<Module>.md existir, adicionar seção “API Spec” com link para o doc gerado
+
+STEP 7 – GIT_COMMIT  
+• `git add contracts/api/<modulo>.openapi.yaml docs/impl/docs/OPENAPI_<Module>.md README_<Module>.md`  
+• `git commit -m "docs(<Module>): openapi spec & overview"`
+
+EXPECTED_OUTPUT:  
+Markdown estruturado com os passos numerados e comando Git, pronto para uso no chat da fase de documentação.

@@ -1,0 +1,50 @@
+---
+description: Padrões para criação de UseCases em Application Layer
+globs: ["app/Application/**/UseCases/*.php"]
+alwaysApply: false
+---
+
+ACTION: USECASE_IMPLEMENTATION
+
+STEP 1: STRUCTURE_VALIDATION
+
+- ENSURE cada UseCase esteja em uma subpasta `app/Application/<Modulo>/UseCases/`.
+- ENSURE o nome siga padrão `Execute<Acao>UseCase`.
+
+STEP 2: CONSTRUCTOR_CONTRACTS
+
+- VALIDATE que todas as dependências no construtor sejam **contratos de interfaces**, nunca implementações concretas.
+- CHECK se bindings dessas interfaces existem nos Providers.
+
+STEP 3: METHOD_STANDARDIZATION
+
+- ENSURE o método principal seja `__invoke()` ou `handle()`.
+- IF método estiver ausente ⇒ SUGIRA criação padrão.
+
+STEP 4: DTO_COMPATIBILITY
+
+- CHECK se existe DTO correspondente em `Application/<Modulo>/DTOs/`.
+- IF faltando ⇒ SUGERIR `InputDTO` + `OutputDTO` com tipos fortes.
+
+STEP 5: QUERY_SEPARATION
+
+- IF operação for leitura pura ⇒ REDIRECIONAR para `Queries/` com retorno otimizado.
+- ENFORCE CQRS separation quando aplicável.
+
+STEP 6: TEST_CHECK
+
+- VALIDATE cobertura mínima de testes unitários em `tests/Unit/<Modulo>/`.
+
+---
+
+EXPECTED_OUTPUT:
+
+Um conjunto de UseCases com:
+
+- Nomenclatura padronizada.
+- Dependências desacopladas via contratos.
+- DTOs robustos e fortemente tipados.
+- Separação clara entre comando e consulta.
+- Cobertura de testes mínima garantida.
+
+---

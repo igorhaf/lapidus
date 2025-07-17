@@ -1,0 +1,41 @@
+---
+description: Define Enums e Value Objects do módulo
+globs:
+  ["app/Domain/*/Enums/**/*.php", "app/Domain/*/ValueObjects/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: ENUMS_AND_VALUE_OBJECTS
+
+STEP 1 – VALIDATE_INPUT
+• Verificar se `phase: enums` e `module: <Module>` estão definidos no prompt.
+• Certificar que `<Module>` corresponde a uma pasta em `app/Domain/<Module>`.
+
+STEP 2 – SCAN_BLUEPRINT
+• Ler `docs/impl/blueprint/BLUEPRINT_<Module>.md` para identificar status, categorias e tipos previstos para enumeração e objetos de valor.
+• Confirmar que todas as entradas da tabela de Enums estão representadas como classes ou arquivos em `app/Domain/<Module>/Enums`.
+
+STEP 3 – ENUM_IMPLEMENTATION
+• Validar se cada Enum do módulo está implementado como `enum NomeEnum: string`.
+• Confirmar presença de métodos utilitários quando necessário (ex.: `cases()`, `from()`, `toArray()`).
+• Para cada Enum, gerar instruções se ValueObject correspondente não existir (ex.: MoneyEnum → Money VO).
+
+STEP 4 – VALUE_OBJECT_IMPLEMENTATION
+• Verificar presença de classes em `app/Domain/<Module>/ValueObjects` para cada tipo que exige validação (ex.: Email, Slug, Money).
+• Assegurar que VO:
+  - São imutáveis (`private readonly`).
+  - Validam entrada em construtor ou método estático `make()`.
+  - Possuem métodos `toString()` ou `value()` ou equivalente.
+
+STEP 5 – GENERATE_DOC
+• Criar `ENUMS_<Module>.md` em `docs/impl/enums/` com:
+  - Lista de Enums e ValueObjects detectados.
+  - Gaps identificados e instruções de implementação.
+  - Referência ao blueprint e convenções.
+
+STEP 6 – GIT_COMMIT
+• `git add app/Domain/<Module>/Enums app/Domain/<Module>/ValueObjects docs/impl/enums/ENUMS_<Module>.md`
+• `git commit -m "feat(<Module>): enums & value objects"`
+
+EXPECTED_OUTPUT:
+Markdown com os passos executados, gaps encontrados e o commit adequado.

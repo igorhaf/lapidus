@@ -1,0 +1,35 @@
+---
+description: Popula dados de exemplo usando Factories para desenvolvimento e testes
+globs:
+  - "database/seeders/**/*.php"
+alwaysApply: false
+---
+
+ACTION: SEEDERS
+
+STEP 1 – CONTEXT_LOAD  
+• Validar existência de Factories em `database/factories/<Module>Factory.php`  
+• Garantir que migrations foram executadas e tabelas estão consistentes
+
+STEP 2 – FACTORY_USAGE  
+• Utilizar Factories para criar dados coerentes em quantidade realista (e.g., 20–50 registros principais)  
+• Incluir relacionamentos (usuário com perfil, produto com categoria, etc.)
+
+STEP 3 – REALISTIC_CONTENT  
+• Gerar conteúdo em PT‑BR com Faker (nome, descrição, imagem fake via unsplash.it)  
+• Preencher todos campos obrigatórios e respeitar constraints (unique, FK)
+
+STEP 4 – DATABASE_SEEDER_REGISTRATION  
+• Registrar new `<Module>Seeder` em `DatabaseSeeder.php` com ordem correta  
+• Garantir idempotência usando `firstOrCreate()` ou `truncate()` conforme padrão do projeto
+
+STEP 5 – DOCUMENTATION  
+• Gerar `SEEDERS_<Module>.md` em `docs/impl/seeders/` via template IMPLEMENTATION (tarefas, arquivos, como testar, próximos passos)  
+• Chamar commit automático
+
+STEP 6 – GIT_COMMIT  
+• `git add database/seeders docs/impl/seeders/SEEDERS_<Module>.md`  
+• `git commit -m "feat(<Module>): seeders"`
+
+EXPECTED_OUTPUT:  
+Markdown com todos os passos numerados e bloco `git commit`, aplicável ao prompt da fase seeder.

@@ -1,0 +1,41 @@
+---
+description: Geração de contratos OpenAPI, documentação de endpoints e registros de decisão (ADR) para o módulo.
+globs:
+  - "contracts/api/**/*.yaml"
+  - "docs/README_*.md"
+  - "docs/ADR/*.md"
+alwaysApply: false
+---
+
+ACTION: LARAVEL_DOCS_GENERATION
+
+STEP 1: OPENAPI_CONTRACT
+
+- IDENTIFY all public endpoints exposed by the module via Route + Controller.
+- MAP each route to an OpenAPI `paths` entry.
+- DEFINE request/response schemas with precise typing (DTOs, Enums, pagination).
+- ANNOTATE metadata (summary, tags, security, status codes).
+- STORE as `contracts/api/<module>.openapi.yaml`.
+
+STEP 2: README_DOCUMENTATION
+
+- SUMMARIZE the module’s purpose, endpoints, expected payloads and integration notes.
+- LIST each action/controller with usage examples.
+- INCLUDE example requests and responses using real data.
+- HIGHLIGHT optional parameters, validation constraints and rate limits.
+- STORE as `docs/README_<Module>.md`.
+
+STEP 3: ADR_REGISTRY
+
+- IF architecture decisions were made (ex: Swagger over Postman, REST over GraphQL), THEN:
+  - CREATE a markdown ADR file in `docs/ADR/` explaining the context, options considered, and decision rationale.
+  - FOLLOW format: “ADR-<seq>-<slug>.md”.
+
+EXPECTED_OUTPUT:
+
+A consistent and accurate documentation suite covering the public contract surface of the module:
+- A complete OpenAPI 3.1 spec file.
+- A developer-friendly README for integration and QA teams.
+- Up-to-date architectural reasoning recorded as ADRs when applicable.
+
+Avoid speculative endpoints or missing fields. Prefer precision and traceability across source code, schema and usage.

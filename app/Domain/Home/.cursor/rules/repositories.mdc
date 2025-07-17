@@ -1,0 +1,36 @@
+---
+description: "Define contratos e padrões para repositórios no módulo Home"
+globs:
+  - "app/Domain/Home/Interfaces/Repositories/**/*.php"
+  - "app/Infra/Repositories/Eloquent/Home/**/*.php"
+alwaysApply: false
+---
+
+ACTION: REPOSITORIES
+
+STEP 1 – CONTEXT_LOAD  
+• GARANTIR que `PROJECT_CONTEXT.md` e `docs/impl/repositories/REPOSITORIES_Home.md` estejam disponíveis ou serão gerados.  
+• VALIDAR que estamos no módulo `Home` (`module: Home`) e phase apropriada.
+
+STEP 2 – INTERFACE_CHECK  
+• VERIFICAR se existe interface de repositório em `Domain/Home/Interfaces/Repositories` (ex.: `HomeRepositoryInterface`).  
+• SE não existir → INSTRUÇÃO para criar uma interface com métodos CRUD e buscas específicas.
+
+STEP 3 – ELOQUENT_IMPL  
+• CRIAR implementação em `Infra/Repositories/Eloquent/Home/...` (ex.: `EloquentHomeRepository`).  
+• CERTIFICAR que usa injeção de dependência e segue contratos da interface.
+
+STEP 4 – PAGINATION_CACHING  
+• CHECAR padrões: todos os métodos pagináveis devem suportar `paginate()` e filtros.  
+• INSTRUÇÃO para implementar cache por TTL, se aplicável (ex.: Redis).
+
+STEP 5 – TEST_COVERAGE  
+• SUGERIR criação de teste de integração subterrâneo simulando CRUD e buscas.  
+• INSTRUÇÃO para preencher `docs/impl/repositories/REPOSITORIES_Home.md` com métodos, contratos, padrões, TTL e exemplos.
+
+STEP 6 – GIT_COMMIT  
+• `git add app/Domain/Home/Interfaces/Repositories app/Infra/Repositories/Eloquent/Home docs/impl/repositories/REPOSITORIES_Home.md`  
+• `git commit -m "feat(Home): repositories"`
+
+EXPECTED_OUTPUT:  
+Markdown com lista de steps numerados conforme acima, e bloco de commit detalhado, pronto para colar no agente da fase `repositories`.

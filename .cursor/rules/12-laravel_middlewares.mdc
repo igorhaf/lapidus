@@ -1,0 +1,50 @@
+---
+description: Define HTTP Middlewares do módulo
+globs: ["app/Http/Middleware/**"]
+alwaysApply: false
+---
+
+ACTION: MIDDLEWARE_IMPLEMENTATION
+
+STEP 1: CONTEXT_ANALYSIS
+
+- LEIA o arquivo `PROJECT_CONTEXT.md` para entender arquitetura, escopo e padrões.
+- VERIFIQUE se já existem middlewares genéricos aplicáveis no projeto.
+- ENTENDA se o middleware será por domínio (ex.: tenant), por segurança (auth/roles), ou técnico (logging/throttle/cache).
+
+STEP 2: NAMING_AND_LOCATION
+
+- DEFINA um nome explícito e coeso para o middleware (ex.: `CheckTenantScope`, `ForceJsonResponse`).
+- CRIE o arquivo em `app/Http/Middleware/`.
+
+STEP 3: IMPLEMENTATION
+
+- IMPLANTE o método `handle()` seguindo padrão Laravel.
+- SE o middleware tiver comportamento condicional, adicione validação robusta (evitar `if`s vazios).
+- USE helpers como `request()->routeIs()` ou `Str::startsWith()` para lógica de roteamento.
+
+STEP 4: BINDING
+
+- REGISTRE o middleware:
+  - Global → em `app/Http/Kernel.php` no array `$middleware`
+  - Grupo (`web`, `api`) → array `$middlewareGroups`
+  - Rota individual → `$routeMiddleware`
+
+STEP 5: USO ESTRATÉGICO
+
+- APLIQUE em rotas específicas (`Route::middleware('check.tenant')->group(...)`)
+- CONSIDERE middlewares encadeados para validação progressiva.
+- SE FOR SENSÍVEL (ex.: segurança, multi-tenant), escreva testes robustos.
+
+STEP 6: DOCUMENTAÇÃO E TESTES
+
+- DOCUMENTE o middleware no `README_<Module>.md` e nos arquivos `.openapi.yaml` (se aplicável).
+- ESCREVA testes em `tests/Feature/<Module>/MiddlewareTest.php`.
+
+EXPECTED_OUTPUT:
+
+- Middleware funcional, testado, aplicado de forma correta no `Kernel`, com comportamento previsível e documentado.
+
+Comando git:
+git add app/Http/Middleware/ tests/Feature docs/README_<Module>.md && \
+git commit -m "feat(<Module>): implement middleware(s)"

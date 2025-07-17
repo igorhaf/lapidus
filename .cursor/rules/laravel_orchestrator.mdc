@@ -1,0 +1,48 @@
+---
+description: Orquestra todas as fases de 0 a 18 com formato ACTION/STEP padronizado para cada fase do módulo
+globs:
+  ["app/","database/","resources/","tests/","contracts/","docs/"]
+alwaysApply: false
+---
+
+ACTION: ORCHESTRATION
+
+STEP 1 – CONTEXT_VALIDATE  
+• VALIDAR entrada `phase: <fase>` e `module: <NomeModulo>`  
+• CARREGAR PROJECT_CONTEXT.md para garantir alinhamento com stack e convenções  
+
+STEP 2 – PHASE_ROUTING  
+• IDENTIFICAR qual fase está sendo solicitada (0 → 18):
+
+    - **0 (BLUEPRINT)** → acionar ACTION: BLUEPRINT  
+    - **1 (MIGRATIONS)** → acionar ACTION: MIGRATIONS  
+    - **2 (MODELS)** → acionar ACTION: MODELS  
+    - **3 (SEEDERS)** → acionar ACTION: SEEDERS  
+    - **4 (FORMREQUESTS)** → acionar ACTION: FORMREQUESTS  
+    - **5 (ENUMS)** → acionar ACTION: ENUMS  
+    - **6 (REPOSITORIES)** → acionar ACTION: REPOSITORIES  
+    - **7 (USECASES)** → acionar ACTION: USECASES  
+    - **8 (SERVICES)** → acionar ACTION: SERVICES  
+    - **9 (ACTIONS)** → acionar ACTION: ACTIONS  
+    - **10 (EVENTS)** → acionar ACTION: EVENTS  
+    - **11 (POLICIES)** → acionar ACTION: POLICIES  
+    - **12 (MIDDLEWARES)** → acionar ACTION: MIDDLEWARES  
+    - **13 (CONTROLLERS)** → acionar ACTION: CONTROLLERS  
+    - **14 (ROUTES)** → acionar ACTION: ROUTES  
+    - **15 (DESIGNSYSTEM)** → acionar ACTION: DESIGNSYSTEM  
+    - **16 (UI)** → acionar ACTION: UI  
+    - **17 (DOCS)** → acionar ACTION: DOCS  
+    - **18 (TESTS)** → acionar ACTION: TESTS  
+
+STEP 3 – PREVIOUS_PHASE_CHECK  
+• ASEGURAR que artefatos das fases anteriores existem e são consistentes  
+
+STEP 4 – EXECUTE_PHASE  
+• INJETAR bloco interno com ACTION/STEP específico para a fase atual  
+
+STEP 5 – GIT_COMMIT_PREP  
+• PREPARAR comando de commit conforme padrão:  
+  `git add …docs/impl/<fase>/<FASE>_<Module>.md && git commit -m "<tag>(<Module>): <fase>"`
+
+EXPECTED_OUTPUT:  
+Markdown com todas validações e o bloco da fase específica, sem código-fonte, pronto para colar.  

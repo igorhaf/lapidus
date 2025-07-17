@@ -1,0 +1,41 @@
+---
+description: Convenções de acesso a dados usando o padrão Repository
+globs:
+  - app/Domain/**/Interfaces/Repositories/**
+  - app/Infra/Repositories/**
+  - app/Infra/Providers/RepositoryServiceProvider.php
+alwaysApply: false
+---
+
+ACTION: REPOSITORY_IMPLEMENTATION
+
+STEP 1: DOMAIN CONTRACT
+
+- DEFINA uma interface de repositório em `Domain/<Modulo>/Interfaces/Repositories/`.
+- SIGA o padrão CRUD + queries específicas por contrato (ex.: `findByEmail`, `paginateByStatus`).
+- PREFIRA usar tipagem forte em métodos (ex.: DTOs, ValueObjects).
+- EVITE retornar Eloquent ou modelos acoplados.
+
+STEP 2: INFRA IMPLEMENTATION
+
+- IMPLEMENTE o contrato em `Infra/Repositories/Eloquent/<Modulo>Repository`.
+- EXTENDA `BaseRepository` se aplicável (ex.: paginate, TTL caching).
+- INJETAR os Models via construtor ou service locator.
+- USE o cache apenas em queries legíveis (getAll, paginate).
+
+STEP 3: BINDING
+
+- REGISTRE o vínculo contrato → implementação no `RepositoryServiceProvider`.
+- USE o método `bind()` com FQCNs, não strings mágicas.
+- GARANTA que o provider esteja listado em `config/app.php`.
+
+STEP 4: TTL (SE APLICÁVEL)
+
+- DEFINA constantes `TTL_*` para controlar cache em minutos.
+- USE tags de cache por módulo (ex.: `cache()->tags(['modulo'])`).
+
+EXPECTED_OUTPUT:
+
+Uma implementação desacoplada do padrão Repository, com binding explícito, suporte a TTL quando aplicável, consistência entre contrato e implementação, e alinhamento com os padrões da camada de domínio.
+
+Evite leaks de Eloquent no domínio. Prefira abstrações claras com foco em testabilidade e leitura.

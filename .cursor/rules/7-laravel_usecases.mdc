@@ -1,0 +1,38 @@
+---
+description: Define UseCases, DTOs e Queries para um módulo específico
+globs: ["app/Application/*/UseCases/**/*.php", "app/Application/*/DTOs/**/*.php", "app/Application/*/Queries/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: USECASES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para alinhar visão e convenções  
+• VALIDAR presence de phase: usecases e module: <Module>
+
+STEP 2 – IDENTIFY_USECASES  
+• LISTAR funções de negócio do módulo (ex.: Create, Update, Delete, List)  
+• Para cada função, definir nome de UseCase seguindo `Execute<Acao>UseCase`
+
+STEP 3 – STRUCTURE_USECASE  
+• Criar stub de classe em `app/Application/<Module>/UseCases/` com métodos `__invoke()` ou `handle()`  
+• Incluir injeção dos contratos (Repositories/Services) no construtor
+
+STEP 4 – DEFINE_DTOS_AND_QUERIES  
+• Criar DTOs em `app/Application/<Module>/DTOs/` com propriedades estritamente tipadas  
+• Criar Queries em `app/Application/<Module>/Queries/` para leituras específicas (CQRS read-model)
+
+STEP 5 – CONSISTENCY_CHECK  
+• Verificar naming coerente com Conventions e Domain (Entities, Enums, Actions)  
+• Garantir que UseCase invoque Actions/Services adequados e retorne DTOs
+
+STEP 6 – DOCUMENT_IMPLEMENTATION  
+• Gerar `USECASES_<Module>.md` em `docs/impl/usecases/` com template IMPLEMENTATION  
+  (resumo + localização de arquivos + como testar)
+
+STEP 7 – GIT_COMMIT  
+• `git add app/Application/<Module>/UseCases app/Application/<Module>/DTOs app/Application/<Module>/Queries docs/impl/usecases/USECASES_<Module>.md`  
+• `git commit -m "feat(<Module>): usecases"`
+
+EXPECTED_OUTPUT:  
+Markdown contendo steps 1–7 num bloco, numerado, sem código-fonte da aplicação, pronto para colar no chat da fase usecases.

@@ -1,0 +1,30 @@
+---
+description: Gera Actions unitárias para casos de uso específicos do módulo
+globs: ["app/Domain/*/Actions/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: ACTIONS
+
+STEP 1 – CONTEXT_LOAD
+• VERIFICAR `phase: actions` + `module: <NomeModulo>`
+• ABRIR `PROJECT_CONTEXT.md` e blueprint para contexto
+
+STEP 2 – IDENTIFY_ACTIONS
+• IDENTIFICAR operações unitárias do módulo (ex.: Create, Update, Delete, CalcularFrete)
+• PARA CADA action: definir objetivo e parâmetros
+
+STEP 3 – CREATE_ACTION_CLASS
+• GERAR `<Verb><Entity>Action.php` em `app/Domain/<Module>/Actions/`
+• IMPLEMENTAR `__invoke()` ou método `handle()` com lógica de domínio pura (sem infra)
+
+STEP 4 – DOCUMENT_ACTION
+• GERAR `ACTIONS_<Module>.md` em `docs/impl/actions/` usando template IMPLEMENTATION
+• Incluir resumo, inputs, outputs, dependências, como testar
+
+STEP 5 – GIT_COMMIT
+• Executar `git add app/Domain/<Module>/Actions docs/impl/actions/ACTIONS_<Module>.md`
+  && `git commit -m "feat(<Module>): actions"`
+
+EXPECTED_OUTPUT:
+Markdown com todos os passos numerados e o bloco de commit, pronto para colar no chat da fase 9.

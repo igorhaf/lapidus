@@ -1,0 +1,34 @@
+---
+description: Gera migrations consistentes com blueprint + enums
+globs:
+  ["database/migrations/**/*.php", "app/Domain/**/*Migration*.php"]
+alwaysApply: false
+---
+
+ACTION: MIGRATIONS
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR `PROJECT_CONTEXT.md` e blueprint (`docs/impl/blueprint/BLUEPRINT_<Module>.md`)  
+• VALIDAR phase: migrations e module: `<Module>`
+
+STEP 2 – VERIFY_BLUEPRINT  
+• CONFERIR tabelas e colunas definidas no blueprint  
+• IDENTIFICAR enums e ValueObjects referenciados
+
+STEP 3 – CREATE_MIGRATIONS  
+• CRIAR arquivos de migration em `database/migrations`, usando snake_case  
+• INCLUIR PKs, FKs, índices, timestamps, softDeletes conforme blueprint  
+• GARANTIR reversão incremental caso entidades já existam
+
+STEP 4 – ENUM_FIELDS  
+• APLICAR `enum()` para colunas que usam enums (Laravel 11 syntax)
+
+STEP 5 – DOCUMENT_MIGRATIONS  
+• GERAR `MIGRATIONS_<Module>.md` em `docs/impl/migrations/` com resumo e detalhes
+
+STEP 6 – GIT_COMMIT  
+• `git add database/migrations docs/impl/migrations/MIGRATIONS_<Module>.md`  
+• `git commit -m "feat(<Module>): migrations"`
+
+EXPECTED_OUTPUT:  
+Markdown com passos numerados (1–6) e comando de commit, pronto para colar no chat da fase migrations.

@@ -1,0 +1,43 @@
+---
+description: Regra para Controllers API single-action – validação de resposta JSON e tratamento de erros
+globs:
+  ["app/Http/Controllers/Api/V1/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: CONTROLLER
+
+STEP 1 – CONTEXT_CHECK  
+• Validar que `phase: controller` e `module: <NomeModulo>` estejam corretos.  
+• Garantir leitura de `PROJECT_CONTEXT.md` para convenções gerais.
+
+STEP 2 – REQUEST_VALIDATION  
+• Checar uso correto de FormRequest em controllers (`$request->validated()`).  
+• Garantir tipo de resposta JSON via `response()->json()` ou `Resource::collection()`.
+
+STEP 3 – ERROR_HANDLING  
+• Verificar tratamento de exceções específicas com `try/catch` ou via Handler global.  
+• Garantir resposta JSON com status adequado e mensagem clara em falhas.
+
+STEP 4 – AUTH & POLICY  
+• Confirmar uso de `authorize()` ou `Gate` antes da execução do UseCase.  
+• Garantir retorno `403` se permissão negada.
+
+STEP 5 – INVOKE_USECASE  
+• Controller deve chamar o UseCase correspondente com injeção de dependência.  
+• Não conter lógica de negócio — apenas transformação de request → UseCase.
+
+STEP 6 – RESPONSE_FORMAT  
+• Formatar saída conforme resource ou JSON configurado nos convenções do projeto.  
+• Incluir metadata padrão (ex.: `meta: ['status' => 'success']`) se aplicável.
+
+STEP 7 – DOC_GENERATION  
+• Gerar CONTROLLERS_<Module>.md em `docs/impl/controllers/`  
+com resumo das instruções e exemplos de request/response.
+
+STEP 8 – GIT_COMMIT  
+• `git add app/Http/Controllers/Api/V1/<Module> docs/impl/controllers/CONTROLLERS_<Module>.md`  
+• Commit: `feat(<Module>): controllers`
+
+EXPECTED_OUTPUT:  
+Markdown com os passos acima numerados, sem código-fonte, pronto para ser colado no prompt da fase controller.

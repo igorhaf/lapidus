@@ -1,0 +1,45 @@
+---
+description: Cria páginas Vue/Blade da UI para o módulo específico
+globs:
+  - "resources/js/modules/<module>/**/*.vue"
+  - "resources/views/<module>/**/*.blade.php"
+alwaysApply: false
+---
+
+ACTION: UI
+
+STEP 1 – CONTEXT_LOAD
+• Verificar que `PROJECT_CONTEXT.md` está disponível
+• Validar presence de `phase: ui` e `module: <Module>` no prompt
+
+STEP 2 – DESIGN_TOKEN_CHECK
+• Confirmar existência de `resources/design/<module>.json`
+• Garantir que tokens (cores, spacing, radius) sejam consumidos nos componentes
+
+STEP 3 – CREATE_BLADE_VIEWS
+• Criar views Blade em `resources/views/<module>/`
+• Incluir sections padrão: layout, <Head> com SEO tags, placeholders para Vue components
+
+STEP 4 – CREATE_VUE_COMPONENTS
+• Criar componentes Vue em `resources/js/modules/<module>/`
+• Utilizar design tokens via Tailwind e JSON
+• Incluir slots necessários e validar responsividade (mobile + dark mode)
+
+STEP 5 – INTEGRATION_WITH_INERTIA
+• Garantir setup Inertia: páginas chamam Blade + props via controller
+• Adicionar suspense/lazy‑load para componentes Vue
+
+STEP 6 – FILE_STRUCTURE_VALIDATION
+• Validar árvore de arquivos criada conforme convenção (views + js modules)
+• Verificar namespace correto e PascalCase em componentes
+
+STEP 7 – DOC_GENERATION
+• Gerar `UI_<Module>.md` em `docs/impl/ui/` com template IMPLEMENTATION  
+  – descrição da página, arquivos gerados, dependências, como testar
+
+STEP 8 – GIT_COMMIT
+• `git add resources/views/<module> resources/js/modules/<module> docs/impl/ui/UI_<Module>.md`  
+• `git commit -m "feat(<Module>): ui"`
+
+EXPECTED_OUTPUT:
+Markdown puro com todos os passos numerados e bloco de comando git pronto para colar.  

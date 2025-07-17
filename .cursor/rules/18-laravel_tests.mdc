@@ -1,0 +1,41 @@
+---
+description: Gera testes unitários, feature e browser para o módulo
+globs: ["tests/Unit/**/*.php","tests/Feature/**/*.php","tests/Browser/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: TESTS
+
+STEP 1 – CONTEXT_LOAD
+• VALIDAR a entrada `phase: tests` e `module: <NomeModulo>`
+• ABRIR PROJECT_CONTEXT.md para garantir alinhamento com stack/convenções
+• CONFIRMAR que artefatos das fases 0–17 já existem (models, controllers, migrations)
+
+STEP 2 – UNIT_TEST_GENERATION
+• CRIAR testes unitários para Entities, Services, UseCases.  
+• GARANTIR cobertura de 100 % para lógica de negócio isolada  
+• USAR factories correspondentes (`<Modulo>Factory`) com dados PT‑BR
+
+STEP 3 – FEATURE_TEST_GENERATION
+• CRIAR Feature tests com HTTP fake DB (sqlite memory)  
+• TESTAR endpoints CRUD principais (`index`, `show`, `store`, `update`, `delete`)  
+• VALIDAR respostas JSON corretas e códigos HTTP (200, 201, 204, 404, 422)
+
+STEP 4 – BROWSER_TEST_GENERATION
+• CRIAR teste E2E (Dusk ou Playwright) com fluxo “login + CRUD + logout”  
+• INCLUIR login usando Inertia + interação com formulário e visualização de lista
+
+STEP 5 – COVERAGE_REPORT
+• RODAR PHPUnit com `--coverage-html`  
+• GERAR relatório em `storage/coverage` ou `build/coverage`
+
+STEP 6 – DOCS_UPDATE
+• GERAR `TESTS_<Module>.md` em docs/impl/tests/ com resumo: escopo, pontos cobertos, próximos passos  
+• ATUALIZAR README_<Module>.md incluindo link para o relatório
+
+STEP 7 – GIT_COMMIT
+• `git add tests docs/impl/tests/TESTS_<Module>.md storage/coverage/**/*`  
+• `git commit -m "test/docs(<Module>): coverage & docs"`
+
+EXPECTED_OUTPUT:
+Markdown contendo os passos acima numerados, sem código-fonte, pronto para colar no chat da fase tests.

@@ -1,0 +1,45 @@
+---
+description: Geração da camada UI (Blade + Vue + design tokens)
+globs: ["resources/js/modules/home/**", "resources/views/home/**", "resources/design/home.json"]
+alwaysApply: false
+---
+
+ACTION: UI_LAYER_IMPLEMENTATION
+
+STEP 1: DESIGN TOKEN LOAD
+- CARREGAR arquivo `resources/design/home.json`
+- MAPEAR tokens para cores, tipografia, espaçamentos, etc.
+- DEFINIR variantes (ex: primary, secondary, danger)
+- VALIDAR consistência com design system global
+
+STEP 2: COMPONENT CREATION (VUE)
+- CRIAR pasta `resources/js/modules/home/components/`
+- GERAR componentes Vue baseados nos tokens:
+  - Button.vue, Input.vue, Card.vue, etc.
+- DOCUMENTAR props e slots via JSDoc
+- TESTAR responsividade e dark-mode
+- APLICAR lazy-loading e Suspense quando necessário
+
+STEP 3: PAGE IMPLEMENTATION (VUE)
+- CRIAR arquivos de página em `resources/js/modules/home/pages/`
+- INCLUIR SEO tags com `<Head>`
+- ORGANIZAR layout usando Grid + Tailwind Utility Classes
+
+STEP 4: BLADE FALLBACK
+- CRIAR views SSR em `resources/views/home/`
+- UTILIZAR os mesmos tokens e semânticas visuais
+- EVITAR duplicação de lógica entre Blade e Vue
+
+STEP 5: UI INTEGRATION CHECK
+- VALIDAR integração com os UseCases e rotas mapeadas
+- TESTAR navegação, comportamento e consistência visual
+
+EXPECTED_OUTPUT:
+- UI modular e consistente, com base nos design tokens.
+- Componentes Vue documentados e responsivos.
+- Views Blade criadas como fallback SSR.
+- Integração total com fluxo de dados do módulo `home`.
+
+Comando git:
+git add resources/js/modules/home/ resources/views/home/ resources/design/home.json && \
+git commit -m "feat(home): UI layer implementation"

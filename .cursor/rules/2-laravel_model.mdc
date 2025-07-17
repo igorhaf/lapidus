@@ -1,0 +1,36 @@
+---
+description: Gera Models, Factories e testes para o módulo
+globs:
+  - "app/Domain/*/Entities/*.php"
+  - "database/factories/*Factory.php"
+  - "tests/Unit/*"
+alwaysApply: false
+---
+
+ACTION: MODEL_LAYER
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para referência das convenções  
+• VALIDAR `phase: model` e `module: <Module>`
+
+STEP 2 – MODEL_CREATION  
+• CRIAR Model em `app/Domain/<Module>/Entities`  
+  - Definir `$fillable` com campos do migration, excluindo PK e timestamps  
+  - Definir `$casts` (boolean, enum, datetime, json conforme necessário)  
+  - Criar Scopes se houver filtragem por tenant
+
+STEP 3 – FACTORY_SETUP  
+• CRIAR Factory em `database/factories/<Module>Factory.php`  
+  - Usar `Enum::cases()[…]` para preencher campos enum  
+  - Gerar dados realistas para testes
+
+STEP 4 – MODEL_TEST_STUB  
+• CRIAR stub de teste em `tests/Unit/<Module>/<Module>ModelTest.php`  
+  - Verificar relações `hasMany` / `belongsTo`  
+  - Verificar casts e `$fillable`
+
+STEP 5 – DOCGEN  
+• GERAR `MODELS_<Module>.md` em `docs/impl/models/` usando template IMPLEMENTATION
+
+STEP 6 – GIT_COMMIT  
+• EXECUTAR:  

@@ -1,0 +1,998 @@
+---
+description: Cria blueprint inicial do módulo (visão, ERD, user‑stories, roadmap)
+globs:
+alwaysApply: false
+---
+
+ACTION: BLUEPRINT
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR que a mensagem contenha `phase: blueprint` e `module: <NomeModulo>`
+
+STEP 2 – DEFINE_VIEW  
+• DESCREVER a visão do módulo: problema, objetivos e stakeholders
+
+STEP 3 – ERD_MODEL  
+• GERAR ERD textual com tabelas em snake_case, PKs, FKs, índices
+
+STEP 4 – USER_STORIES  
+• LISTAR pelo menos 3 user stories no formato “Como <persona>, quero <ação>, para <valor>”
+
+STEP 5 – ROADMAP  
+• MONTAR roadmap semestral (v0.1 → v0.5) com KPIs
+
+STEP 6 – ENUMS_IDENTIFICATION  
+• LISTAR possíveis Enums / ValueObjects necessários (ex.: status, categorias)
+
+STEP 7 – DOC_GENERATION  
+• GERAR arquivo `docs/impl/blueprint/BLUEPRINT_<Module>.md`  
+  usando template IMPLEMENTATION (resumo, arquivos, governança, como testar, status)
+
+STEP 8 – GIT_COMMIT  
+• INCLUIR `docs/<Module>.md` e o arquivo em `docs/impl/blueprint/`  
+• COMMIT: `git commit -m "docs: blueprint <Module>"`
+
+EXPECTED_OUTPUT:  
+Markdown com os passos acima numerados, sem gerar código-fonte, pronto para ser colado no canal/fase blueprint.
+
+---
+description: Gera migrations consistentes com blueprint + enums
+globs:
+  ["database/migrations/**/*.php", "app/Domain/**/*Migration*.php"]
+alwaysApply: false
+---
+
+ACTION: MIGRATIONS
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR `PROJECT_CONTEXT.md` e blueprint (`docs/impl/blueprint/BLUEPRINT_<Module>.md`)  
+• VALIDAR phase: migrations e module: `<Module>`
+
+STEP 2 – VERIFY_BLUEPRINT  
+• CONFERIR tabelas e colunas definidas no blueprint  
+• IDENTIFICAR enums e ValueObjects referenciados
+
+STEP 3 – CREATE_MIGRATIONS  
+• CRIAR arquivos de migration em `database/migrations`, usando snake_case  
+• INCLUIR PKs, FKs, índices, timestamps, softDeletes conforme blueprint  
+• GARANTIR reversão incremental caso entidades já existam
+
+STEP 4 – ENUM_FIELDS  
+• APLICAR `enum()` para colunas que usam enums (Laravel 11 syntax)
+
+STEP 5 – DOCUMENT_MIGRATIONS  
+• GERAR `MIGRATIONS_<Module>.md` em `docs/impl/migrations/` com resumo e detalhes
+
+STEP 6 – GIT_COMMIT  
+• `git add database/migrations docs/impl/migrations/MIGRATIONS_<Module>.md`  
+• `git commit -m "feat(<Module>): migrations"`
+
+EXPECTED_OUTPUT:  
+Markdown com passos numerados (1–6) e comando de commit, pronto para colar no chat da fase migrations.
+
+---
+description: Gera Models, Factories e testes para o módulo
+globs:
+  - "app/Domain/*/Entities/*.php"
+  - "database/factories/*Factory.php"
+  - "tests/Unit/*"
+alwaysApply: false
+---
+
+ACTION: MODEL_LAYER
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para referência das convenções  
+• VALIDAR `phase: model` e `module: <Module>`
+
+STEP 2 – MODEL_CREATION  
+• CRIAR Model em `app/Domain/<Module>/Entities`  
+  - Definir `$fillable` com campos do migration, excluindo PK e timestamps  
+  - Definir `$casts` (boolean, enum, datetime, json conforme necessário)  
+  - Criar Scopes se houver filtragem por tenant
+
+STEP 3 – FACTORY_SETUP  
+• CRIAR Factory em `database/factories/<Module>Factory.php`  
+  - Usar `Enum::cases()[…]` para preencher campos enum  
+  - Gerar dados realistas para testes
+
+STEP 4 – MODEL_TEST_STUB  
+• CRIAR stub de teste em `tests/Unit/<Module>/<Module>ModelTest.php`  
+  - Verificar relações `hasMany` / `belongsTo`  
+  - Verificar casts e `$fillable`
+
+STEP 5 – DOCGEN  
+• GERAR `MODELS_<Module>.md` em `docs/impl/models/` usando template IMPLEMENTATION
+
+STEP 6 – GIT_COMMIT  
+• EXECUTAR:  
+
+---
+description: Popula dados de exemplo usando Factories para desenvolvimento e testes
+globs:
+  - "database/seeders/**/*.php"
+alwaysApply: false
+---
+
+ACTION: SEEDERS
+
+STEP 1 – CONTEXT_LOAD  
+• Validar existência de Factories em `database/factories/<Module>Factory.php`  
+• Garantir que migrations foram executadas e tabelas estão consistentes
+
+STEP 2 – FACTORY_USAGE  
+• Utilizar Factories para criar dados coerentes em quantidade realista (e.g., 20–50 registros principais)  
+• Incluir relacionamentos (usuário com perfil, produto com categoria, etc.)
+
+STEP 3 – REALISTIC_CONTENT  
+• Gerar conteúdo em PT‑BR com Faker (nome, descrição, imagem fake via unsplash.it)  
+• Preencher todos campos obrigatórios e respeitar constraints (unique, FK)
+
+STEP 4 – DATABASE_SEEDER_REGISTRATION  
+• Registrar new `<Module>Seeder` em `DatabaseSeeder.php` com ordem correta  
+• Garantir idempotência usando `firstOrCreate()` ou `truncate()` conforme padrão do projeto
+
+STEP 5 – DOCUMENTATION  
+• Gerar `SEEDERS_<Module>.md` em `docs/impl/seeders/` via template IMPLEMENTATION (tarefas, arquivos, como testar, próximos passos)  
+• Chamar commit automático
+
+STEP 6 – GIT_COMMIT  
+• `git add database/seeders docs/impl/seeders/SEEDERS_<Module>.md`  
+• `git commit -m "feat(<Module>): seeders"`
+
+EXPECTED_OUTPUT:  
+Markdown com todos os passos numerados e bloco `git commit`, aplicável ao prompt da fase seeder.
+
+---
+description: "Gera as classes Store e Update FormRequest com validações e prepareForValidation se necessário"
+globs: ["app/Http/Requests/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: FORM_REQUESTS
+
+STEP 1 – CONTEXT_LOAD  
+• Validar que `phase: requests` e `module: <Module>` foram corretamente identificados  
+• Ler `PROJECT_CONTEXT.md` e convenções de pasta
+
+STEP 2 – CREATE_REQUEST_CLASSES  
+• Gerar `Store<Module>Request` e `Update<Module>Request` em `app/Http/Requests/<Module>/`  
+• Adicionar métodos `rules()` com validação completa para campos obrigatórios e formatos  
+• Incluir `authorize()` com retorno `true` ou lógica de autorização básica
+
+STEP 3 – CONDITIONAL_RULES_LOGIC  
+• Se campo slug, email ou data existirem → adicionar `prepareForValidation()` com lógica de formatação  
+• Se houver enum, aplicar validação com `Rule::in([...Enum::cases()])`
+
+STEP 4 – DOC_GENERATION  
+• Gerar arquivo `REQUESTS_<Module>.md` em `docs/impl/requests/` usando o template IMPLEMENTATION
+
+STEP 5 – GIT_COMMIT  
+• `git add app/Http/Requests/<Module>/*.php docs/impl/requests/REQUESTS_<Module>.md`  
+• `git commit -m "feat(<Module>): form requests"`
+
+EXPECTED_OUTPUT:  
+Markdown contendo os passos acima numerados e o comando Git, sem gerar código-fonte, pronto para execução pela fase `requests`.
+
+---
+description: Define Enums e Value Objects do módulo
+globs:
+  ["app/Domain/*/Enums/**/*.php", "app/Domain/*/ValueObjects/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: ENUMS_AND_VALUE_OBJECTS
+
+STEP 1 – VALIDATE_INPUT
+• Verificar se `phase: enums` e `module: <Module>` estão definidos no prompt.
+• Certificar que `<Module>` corresponde a uma pasta em `app/Domain/<Module>`.
+
+STEP 2 – SCAN_BLUEPRINT
+• Ler `docs/impl/blueprint/BLUEPRINT_<Module>.md` para identificar status, categorias e tipos previstos para enumeração e objetos de valor.
+• Confirmar que todas as entradas da tabela de Enums estão representadas como classes ou arquivos em `app/Domain/<Module>/Enums`.
+
+STEP 3 – ENUM_IMPLEMENTATION
+• Validar se cada Enum do módulo está implementado como `enum NomeEnum: string`.
+• Confirmar presença de métodos utilitários quando necessário (ex.: `cases()`, `from()`, `toArray()`).
+• Para cada Enum, gerar instruções se ValueObject correspondente não existir (ex.: MoneyEnum → Money VO).
+
+STEP 4 – VALUE_OBJECT_IMPLEMENTATION
+• Verificar presença de classes em `app/Domain/<Module>/ValueObjects` para cada tipo que exige validação (ex.: Email, Slug, Money).
+• Assegurar que VO:
+  - São imutáveis (`private readonly`).
+  - Validam entrada em construtor ou método estático `make()`.
+  - Possuem métodos `toString()` ou `value()` ou equivalente.
+
+STEP 5 – GENERATE_DOC
+• Criar `ENUMS_<Module>.md` em `docs/impl/enums/` com:
+  - Lista de Enums e ValueObjects detectados.
+  - Gaps identificados e instruções de implementação.
+  - Referência ao blueprint e convenções.
+
+STEP 6 – GIT_COMMIT
+• `git add app/Domain/<Module>/Enums app/Domain/<Module>/ValueObjects docs/impl/enums/ENUMS_<Module>.md`
+• `git commit -m "feat(<Module>): enums & value objects"`
+
+EXPECTED_OUTPUT:
+Markdown com os passos executados, gaps encontrados e o commit adequado.
+
+---
+description: Cria contratos e implementações de repositório para módulos Laravel
+globs: ["app/Domain/**/Interfaces/Repositories/*.php", "app/Infra/Repositories/Eloquent/*.php"]
+alwaysApply: false
+---
+
+ACTION: REPOSITORIES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para as convenções gerais  
+• VALIDAR `phase: repositories` e `module: <Module>`
+
+STEP 2 – INTERFACE_CHECK  
+• IDENTIFICAR contratos existentes em `app/Domain/<Module>/Interfaces/Repositories/`  
+• PARA CADA contrato sem implementação → criar stub correspondente
+
+STEP 3 – IMPLEMENTATION_GENERATION  
+• GERAR classe Eloquent dentro de `app/Infra/Repositories/Eloquent/`, implementando todos os métodos do contrato  
+• GARANTIR uso de QueryBuilder/Eloquent conforme convenções do projeto
+
+STEP 4 – SERVICE_PROVIDER_BINDING  
+• NO `app/Providers/RepositoryServiceProvider.php`, adicionar binding:  
+  `Domain\...Interfaces\Repositories\<RepoInterface>::class => Infra\Repositories\Eloquent\<RepoImplementation>::class`
+
+STEP 5 – DOCUMENTATION  
+• GERAR `REPOSITORIES_<Module>.md` em `docs/impl/repositories/` com resumo de:  
+  - interfaces criadas  
+  - classes implementadas  
+  - bindings feitos
+
+STEP 6 – GIT_COMMIT  
+• COMANDO:  
+  `git add app/Domain/<Module>/Interfaces/Repositories app/Infra/Repositories/Eloquent docs/impl/repositories/`  
+  `git commit -m "feat(<Module>): repositories"`
+
+EXPECTED_OUTPUT:  
+Markdown estruturado em blocos com instruções por passo, incluindo comandos git, pronto para colar no chat da fase repositories.
+
+---
+description: Define UseCases, DTOs e Queries para um módulo específico
+globs: ["app/Application/*/UseCases/**/*.php", "app/Application/*/DTOs/**/*.php", "app/Application/*/Queries/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: USECASES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md para alinhar visão e convenções  
+• VALIDAR presence de phase: usecases e module: <Module>
+
+STEP 2 – IDENTIFY_USECASES  
+• LISTAR funções de negócio do módulo (ex.: Create, Update, Delete, List)  
+• Para cada função, definir nome de UseCase seguindo `Execute<Acao>UseCase`
+
+STEP 3 – STRUCTURE_USECASE  
+• Criar stub de classe em `app/Application/<Module>/UseCases/` com métodos `__invoke()` ou `handle()`  
+• Incluir injeção dos contratos (Repositories/Services) no construtor
+
+STEP 4 – DEFINE_DTOS_AND_QUERIES  
+• Criar DTOs em `app/Application/<Module>/DTOs/` com propriedades estritamente tipadas  
+• Criar Queries em `app/Application/<Module>/Queries/` para leituras específicas (CQRS read-model)
+
+STEP 5 – CONSISTENCY_CHECK  
+• Verificar naming coerente com Conventions e Domain (Entities, Enums, Actions)  
+• Garantir que UseCase invoque Actions/Services adequados e retorne DTOs
+
+STEP 6 – DOCUMENT_IMPLEMENTATION  
+• Gerar `USECASES_<Module>.md` em `docs/impl/usecases/` com template IMPLEMENTATION  
+  (resumo + localização de arquivos + como testar)
+
+STEP 7 – GIT_COMMIT  
+• `git add app/Application/<Module>/UseCases app/Application/<Module>/DTOs app/Application/<Module>/Queries docs/impl/usecases/USECASES_<Module>.md`  
+• `git commit -m "feat(<Module>): usecases"`
+
+EXPECTED_OUTPUT:  
+Markdown contendo steps 1–7 num bloco, numerado, sem código-fonte da aplicação, pronto para colar no chat da fase usecases.
+
+---
+description: Criação de Domain Services stateless para regras de negócio reutilizáveis
+globs:
+  - app/Domain/*/Services/**
+alwaysApply: false
+---
+
+ACTION: DOMAIN_SERVICE_GENERATION
+
+STEP 1: IDENTIFICATION
+- IDENTIFY multi-entity or cross-cutting rules that do not pertain to a single entity.
+- ENSURE that the logic is purely domain-driven, without dependencies on infrastructure or Laravel components.
+- CHECK if the behavior encapsulates policies or decisions better modeled as services.
+
+STEP 2: STRUCTURE
+- DEFINE service classes inside `app/Domain/<Module>/Services/` following the `SomethingService` naming convention.
+- IMPLEMENT stateless methods (no internal state or side effects).
+- USE injected interfaces only — never depend directly on Eloquent, HTTP, or other Laravel components.
+- IF helper logic is shared, EXTRACT into Traits or helper classes in the same namespace.
+
+STEP 3: CONTRACTS (optional)
+- IF service requires abstraction, CREATE interface under `app/Domain/<Module>/Interfaces/Services/`.
+- DEFINE signatures for service behavior to allow mocking/testing and future replacement.
+
+STEP 4: TESTING
+- CREATE unit test files in `tests/Unit/<Module>/Services/`.
+- COVER all public methods using realistic domain data.
+
+EXPECTED_OUTPUT:
+A fully decoupled, stateless Domain Service placed in `app/Domain/<Module>/Services`, tested and ready to be orchestrated via UseCases.
+
+Comando git:
+git add app/Domain/<Module>/Services tests/Unit/<Module>/Services && git commit -m "feat(<Module>): domain services"
+
+---
+description: Gera Actions unitárias para casos de uso específicos do módulo
+globs: ["app/Domain/*/Actions/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: ACTIONS
+
+STEP 1 – CONTEXT_LOAD
+• VERIFICAR `phase: actions` + `module: <NomeModulo>`
+• ABRIR `PROJECT_CONTEXT.md` e blueprint para contexto
+
+STEP 2 – IDENTIFY_ACTIONS
+• IDENTIFICAR operações unitárias do módulo (ex.: Create, Update, Delete, CalcularFrete)
+• PARA CADA action: definir objetivo e parâmetros
+
+STEP 3 – CREATE_ACTION_CLASS
+• GERAR `<Verb><Entity>Action.php` em `app/Domain/<Module>/Actions/`
+• IMPLEMENTAR `__invoke()` ou método `handle()` com lógica de domínio pura (sem infra)
+
+STEP 4 – DOCUMENT_ACTION
+• GERAR `ACTIONS_<Module>.md` em `docs/impl/actions/` usando template IMPLEMENTATION
+• Incluir resumo, inputs, outputs, dependências, como testar
+
+STEP 5 – GIT_COMMIT
+• Executar `git add app/Domain/<Module>/Actions docs/impl/actions/ACTIONS_<Module>.md`
+  && `git commit -m "feat(<Module>): actions"`
+
+EXPECTED_OUTPUT:
+Markdown com todos os passos numerados e o bloco de commit, pronto para colar no chat da fase 9.
+
+---
+description: Define Domain Events e Listeners conforme padrão de fluxo
+globs:
+  ["app/Domain/**/Events/*.php", "app/Listeners/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: DOMAIN_EVENTS_LISTENERS
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR phase: events e module: <Module>  
+
+STEP 2 – IDENTIFY_EVENTS  
+• LISTAR eventos no diretório Domain/<Module>/Events  
+• PARA cada evento, verificar necessidade de listeners ou jobs  
+
+STEP 3 – CREATE_LISTENERS  
+• GERAR Listener para cada evento relevante dentro de app/Listeners  
+• Assegurar assinatura correta (`handle(Event $event)`) e tipagem  
+
+STEP 4 – REGISTER_BINDINGS  
+• ABRIR EventServiceProvider  
+• REGISTRAR evento → listener no array `$listen`  
+
+STEP 5 – TEST_STRATEGY  
+• SUGERIR criação de testes (Unit ou Feature) para cada listener  
+
+STEP 6 – DOC_GENERATION  
+• GERAR `EVENTS_<Module>.md` em `docs/impl/events/`  
+• Incluir resumo: eventos, listeners, localização, como testar  
+
+STEP 7 – GIT_COMMIT  
+• `git add app/Domain/<Module>/Events app/Listeners docs/impl/events/EVENTS_<Module>.md`  
+• `git commit -m "feat(<Module>): events and listeners"`  
+
+EXPECTED_OUTPUT:  
+Saída em markdown com todos os passos numerados, clareza sobre o que gerar em código, e o comando Git pronto para uso.  
+
+---
+description: Geração de Policies para o módulo
+globs:
+  - app/Policies/**
+alwaysApply: false
+---
+
+ACTION: POLICY_DEFINITION
+
+STEP 1: CONTEXT_ANALYSIS
+
+- READ the PROJECT_CONTEXT.md for conventions and authorization logic.
+- READ the blueprint and usecases of the module to understand domain rules.
+- IDENTIFY what resources require access control.
+
+STEP 2: POLICY_STRUCTURE
+
+- CREATE a Policy class under `app/Policies/<Module>Policy.php`.
+- IMPLEMENT methods: `view`, `create`, `update`, `delete`, `restore`, `forceDelete`.
+- APPLY role-based + ownership-based checks in methods.
+- USE `Gate::before` if `isSuperAdmin` shortcut is needed.
+
+STEP 3: SERVICE_PROVIDER_REGISTRATION
+
+- REGISTER the Policy inside `AuthServiceProvider`.
+
+STEP 4: ALIGN_WITH_DOMAIN
+
+- IF domain has permission boundaries, SYNCHRONIZE logic with Domain Services.
+- IF rules vary by tenant or team context, EXTRACT reusable rules as traits.
+
+STEP 5: VALIDATION_AND_TESTS
+
+- VERIFY consistency with FormRequest + UseCases.
+- CREATE unit tests under `tests/Unit/<Module>/Policies`.
+
+EXPECTED_OUTPUT:
+
+A Laravel Policy fully integrated with the domain and respecting layered authorization logic, ready to be injected in route/middleware or controller authorization calls.
+
+Comando git:
+git add app/Policies tests/Unit && git commit -m "feat(<Module>): policies"
+---
+description: Define HTTP Middlewares do módulo
+globs: ["app/Http/Middleware/**"]
+alwaysApply: false
+---
+
+ACTION: MIDDLEWARE_IMPLEMENTATION
+
+STEP 1: CONTEXT_ANALYSIS
+
+- LEIA o arquivo `PROJECT_CONTEXT.md` para entender arquitetura, escopo e padrões.
+- VERIFIQUE se já existem middlewares genéricos aplicáveis no projeto.
+- ENTENDA se o middleware será por domínio (ex.: tenant), por segurança (auth/roles), ou técnico (logging/throttle/cache).
+
+STEP 2: NAMING_AND_LOCATION
+
+- DEFINA um nome explícito e coeso para o middleware (ex.: `CheckTenantScope`, `ForceJsonResponse`).
+- CRIE o arquivo em `app/Http/Middleware/`.
+
+STEP 3: IMPLEMENTATION
+
+- IMPLANTE o método `handle()` seguindo padrão Laravel.
+- SE o middleware tiver comportamento condicional, adicione validação robusta (evitar `if`s vazios).
+- USE helpers como `request()->routeIs()` ou `Str::startsWith()` para lógica de roteamento.
+
+STEP 4: BINDING
+
+- REGISTRE o middleware:
+  - Global → em `app/Http/Kernel.php` no array `$middleware`
+  - Grupo (`web`, `api`) → array `$middlewareGroups`
+  - Rota individual → `$routeMiddleware`
+
+STEP 5: USO ESTRATÉGICO
+
+- APLIQUE em rotas específicas (`Route::middleware('check.tenant')->group(...)`)
+- CONSIDERE middlewares encadeados para validação progressiva.
+- SE FOR SENSÍVEL (ex.: segurança, multi-tenant), escreva testes robustos.
+
+STEP 6: DOCUMENTAÇÃO E TESTES
+
+- DOCUMENTE o middleware no `README_<Module>.md` e nos arquivos `.openapi.yaml` (se aplicável).
+- ESCREVA testes em `tests/Feature/<Module>/MiddlewareTest.php`.
+
+EXPECTED_OUTPUT:
+
+- Middleware funcional, testado, aplicado de forma correta no `Kernel`, com comportamento previsível e documentado.
+
+Comando git:
+git add app/Http/Middleware/ tests/Feature docs/README_<Module>.md && \
+git commit -m "feat(<Module>): implement middleware(s)"
+
+---
+description: Gera single-action Controllers e Resources seguindo padrões Laravel + Clean Architecture
+globs: ["app/Http/Controllers/Api/V1/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: CONTROLLERS
+
+STEP 1 – CONTEXT_LOAD  
+• Ler `PROJECT_CONTEXT.md` para garantir alinhamento com stack, convenções e layout de diretórios.  
+• Validar que `phase: controllers` e `module: <Module>` estão corretos.
+
+STEP 2 – IDENTIFY_CONTROLLERS  
+• Verificar se há controllers para CRUD ou endpoints REST no módulo.  
+• Para cada caso de uso, identificar se será controller `__invoke`.
+
+STEP 3 – FORMREQUEST_INTEGRATION  
+• Garantir uso de FormRequest (ex.: `Store<Module>Request`, `Update<Module>Request`) para validação.  
+• Controller deve tipo-hint FormRequest no método `__invoke()`.
+
+STEP 4 – USECASE_CALL  
+• Injetar e chamar o UseCase correspondente (`Execute<Action>UseCase`).  
+• Mapear dados do FormRequest para o DTO e passar ao UseCase.
+
+STEP 5 – RESOURCE_RESPONSE  
+• Retornar resposta com `new <Module>Resource(...)` ou `ResourceCollection`.  
+• Seguir formato JSON consistente com API v1, incluindo status HTTP apropriado.
+
+STEP 6 – ERROR_HANDLING  
+• Capturar exceções específicas, retornar JSON com `status`, `message`, `errors`.  
+• Permitir propagação de validações padrão.
+
+STEP 7 – DOC_GENERATION  
+• Gerar `CONTROLLERS_<Module>.md` em `docs/impl/controllers/` usando template IMPLEMENTATION.  
+• Incluir resumo, rotas/arquivos envolvidos, exemplos de payloads, como testar.
+
+STEP 8 – GIT_COMMIT  
+• `git add app/Http/Controllers/Api/V1/<Module> docs/impl/controllers/CONTROLLERS_<Module>.md`  
+• `git commit -m "feat(<Module>): controllers"`
+
+EXPECTED_OUTPUT:  
+Markdown com as etapas acima numeradas, pronta para ser colada no chat da fase controllers.
+
+---
+description: Define rotas REST e SSR para o módulo, seguindo convenções Laravel e Inertia
+globs:
+  - "app/Http/Controllers/Api/V1/**/*.php"
+  - "routes/api.php"
+  - "routes/web.php"
+alwaysApply: false
+---
+
+ACTION: ROUTES
+
+STEP 1 – CONTEXT_LOAD  
+• ABRIR PROJECT_CONTEXT.md  
+• VALIDAR phase: routes e module: <Module>
+
+STEP 2 – ROUTE_GROUP_SETUP  
+• CRIAR grupo de rotas com prefixo `/api/v1/<module_slug>`  
+• ADICIONAR middlewares: auth:sanctum, throttle:api (quando aplicável)
+
+STEP 3 – API_RESOURCE  
+• DEFINIR `Route::apiResource('<module_slug>', <Module>Controller::class)`  
+• SE necessário, CRIAR rotas adicionais como relações ou batch
+
+STEP 4 – SSR_ROUTES  
+• NO web.php, DEFINIR rota SSR via Inertia para páginas do módulo  
+• EXEMPLO: `Route::get('/<module_slug>', fn() => Inertia::render(...))`
+
+STEP 5 – ROUTE_NAMING  
+• GARANTIR nomes consistentes: `<module>.<action>`  
+• VALIDAR convenção snake_case ou kebab-case conforme padrão
+
+STEP 6 – DOCUMENTATION  
+• GERAR `ROUTES_<Module>.md` em docs/impl/routes/ via template IMPLEMENTATION  
+• INCLUIR resumo de rotas/API/SSR
+
+STEP 7 – GIT_COMMIT  
+• `git add routes api.php web.php docs/impl/routes/ROUTES_<Module>.md`  
+• `git commit -m "feat(<Module>): routes"`
+
+EXPECTED_OUTPUT:  
+Markdown com blocos das etapas enumeradas acima, sem código-fonte, pronto para ser usado na fase `routes`.
+
+---
+description: Criação e padronização dos componentes base do Design System (Vue + Blade)
+globs:
+alwaysApply: false
+---
+
+ACTION: DESIGN_SYSTEM_COMPONENTS
+
+STEP 1: ANALYZE_REQUIREMENTS
+
+- READ design tokens from resources/design/<module>.json
+- IDENTIFY primary UI elements (buttons, inputs, alerts, modals, etc.)
+- DETERMINE variants and states (hover, focus, disabled, etc.)
+
+STEP 2: IMPLEMENT_COMPONENTS
+
+- CREATE Blade component stubs in resources/views/components/<module>/
+- CREATE Vue components in resources/js/components/<module>/
+- FOLLOW Tailwind utility-first styling and semantic markup
+- DOCUMENT props via JSDoc (Vue) or PHPDoc (Blade)
+
+STEP 3: DOCUMENTATION_AND_USAGE
+
+- GENERATE usage examples in stories or MD files
+- INCLUDE all expected variants in stories or preview pages
+- VALIDATE accessibility (a11y) for each component
+
+EXPECTED_OUTPUT:
+
+A complete and documented base Design System for <module>, with consistent naming, reusability, and accessible implementation in Vue and Blade.
+
+AVOID inconsistent naming, excessive abstractions, or framework-specific hacks.
+
+---
+
+---
+description: Cria páginas Vue/Blade da UI para o módulo específico
+globs:
+  - "resources/js/modules/<module>/**/*.vue"
+  - "resources/views/<module>/**/*.blade.php"
+alwaysApply: false
+---
+
+ACTION: UI
+
+STEP 1 – CONTEXT_LOAD
+• Verificar que `PROJECT_CONTEXT.md` está disponível
+• Validar presence de `phase: ui` e `module: <Module>` no prompt
+
+STEP 2 – DESIGN_TOKEN_CHECK
+• Confirmar existência de `resources/design/<module>.json`
+• Garantir que tokens (cores, spacing, radius) sejam consumidos nos componentes
+
+STEP 3 – CREATE_BLADE_VIEWS
+• Criar views Blade em `resources/views/<module>/`
+• Incluir sections padrão: layout, <Head> com SEO tags, placeholders para Vue components
+
+STEP 4 – CREATE_VUE_COMPONENTS
+• Criar componentes Vue em `resources/js/modules/<module>/`
+• Utilizar design tokens via Tailwind e JSON
+• Incluir slots necessários e validar responsividade (mobile + dark mode)
+
+STEP 5 – INTEGRATION_WITH_INERTIA
+• Garantir setup Inertia: páginas chamam Blade + props via controller
+• Adicionar suspense/lazy‑load para componentes Vue
+
+STEP 6 – FILE_STRUCTURE_VALIDATION
+• Validar árvore de arquivos criada conforme convenção (views + js modules)
+• Verificar namespace correto e PascalCase em componentes
+
+STEP 7 – DOC_GENERATION
+• Gerar `UI_<Module>.md` em `docs/impl/ui/` com template IMPLEMENTATION  
+  – descrição da página, arquivos gerados, dependências, como testar
+
+STEP 8 – GIT_COMMIT
+• `git add resources/views/<module> resources/js/modules/<module> docs/impl/ui/UI_<Module>.md`  
+• `git commit -m "feat(<Module>): ui"`
+
+EXPECTED_OUTPUT:
+Markdown puro com todos os passos numerados e bloco de comando git pronto para colar.  
+
+---
+description: Geração de contratos OpenAPI, documentação de endpoints e registros de decisão (ADR) para o módulo.
+globs:
+  - "contracts/api/**/*.yaml"
+  - "docs/README_*.md"
+  - "docs/ADR/*.md"
+alwaysApply: false
+---
+
+ACTION: LARAVEL_DOCS_GENERATION
+
+STEP 1: OPENAPI_CONTRACT
+
+- IDENTIFY all public endpoints exposed by the module via Route + Controller.
+- MAP each route to an OpenAPI `paths` entry.
+- DEFINE request/response schemas with precise typing (DTOs, Enums, pagination).
+- ANNOTATE metadata (summary, tags, security, status codes).
+- STORE as `contracts/api/<module>.openapi.yaml`.
+
+STEP 2: README_DOCUMENTATION
+
+- SUMMARIZE the module’s purpose, endpoints, expected payloads and integration notes.
+- LIST each action/controller with usage examples.
+- INCLUDE example requests and responses using real data.
+- HIGHLIGHT optional parameters, validation constraints and rate limits.
+- STORE as `docs/README_<Module>.md`.
+
+STEP 3: ADR_REGISTRY
+
+- IF architecture decisions were made (ex: Swagger over Postman, REST over GraphQL), THEN:
+  - CREATE a markdown ADR file in `docs/ADR/` explaining the context, options considered, and decision rationale.
+  - FOLLOW format: “ADR-<seq>-<slug>.md”.
+
+EXPECTED_OUTPUT:
+
+A consistent and accurate documentation suite covering the public contract surface of the module:
+- A complete OpenAPI 3.1 spec file.
+- A developer-friendly README for integration and QA teams.
+- Up-to-date architectural reasoning recorded as ADRs when applicable.
+
+Avoid speculative endpoints or missing fields. Prefer precision and traceability across source code, schema and usage.
+
+---
+description: Gera testes unitários, feature e browser para o módulo
+globs: ["tests/Unit/**/*.php","tests/Feature/**/*.php","tests/Browser/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: TESTS
+
+STEP 1 – CONTEXT_LOAD
+• VALIDAR a entrada `phase: tests` e `module: <NomeModulo>`
+• ABRIR PROJECT_CONTEXT.md para garantir alinhamento com stack/convenções
+• CONFIRMAR que artefatos das fases 0–17 já existem (models, controllers, migrations)
+
+STEP 2 – UNIT_TEST_GENERATION
+• CRIAR testes unitários para Entities, Services, UseCases.  
+• GARANTIR cobertura de 100 % para lógica de negócio isolada  
+• USAR factories correspondentes (`<Modulo>Factory`) com dados PT‑BR
+
+STEP 3 – FEATURE_TEST_GENERATION
+• CRIAR Feature tests com HTTP fake DB (sqlite memory)  
+• TESTAR endpoints CRUD principais (`index`, `show`, `store`, `update`, `delete`)  
+• VALIDAR respostas JSON corretas e códigos HTTP (200, 201, 204, 404, 422)
+
+STEP 4 – BROWSER_TEST_GENERATION
+• CRIAR teste E2E (Dusk ou Playwright) com fluxo “login + CRUD + logout”  
+• INCLUIR login usando Inertia + interação com formulário e visualização de lista
+
+STEP 5 – COVERAGE_REPORT
+• RODAR PHPUnit com `--coverage-html`  
+• GERAR relatório em `storage/coverage` ou `build/coverage`
+
+STEP 6 – DOCS_UPDATE
+• GERAR `TESTS_<Module>.md` em docs/impl/tests/ com resumo: escopo, pontos cobertos, próximos passos  
+• ATUALIZAR README_<Module>.md incluindo link para o relatório
+
+STEP 7 – GIT_COMMIT
+• `git add tests docs/impl/tests/TESTS_<Module>.md storage/coverage/**/*`  
+• `git commit -m "test/docs(<Module>): coverage & docs"`
+
+EXPECTED_OUTPUT:
+Markdown contendo os passos acima numerados, sem código-fonte, pronto para colar no chat da fase tests.
+------
+description: Regra para Controllers API single-action – validação de resposta JSON e tratamento de erros
+globs:
+  ["app/Http/Controllers/Api/V1/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: CONTROLLER
+
+STEP 1 – CONTEXT_CHECK  
+• Validar que `phase: controller` e `module: <NomeModulo>` estejam corretos.  
+• Garantir leitura de `PROJECT_CONTEXT.md` para convenções gerais.
+
+STEP 2 – REQUEST_VALIDATION  
+• Checar uso correto de FormRequest em controllers (`$request->validated()`).  
+• Garantir tipo de resposta JSON via `response()->json()` ou `Resource::collection()`.
+
+STEP 3 – ERROR_HANDLING  
+• Verificar tratamento de exceções específicas com `try/catch` ou via Handler global.  
+• Garantir resposta JSON com status adequado e mensagem clara em falhas.
+
+STEP 4 – AUTH & POLICY  
+• Confirmar uso de `authorize()` ou `Gate` antes da execução do UseCase.  
+• Garantir retorno `403` se permissão negada.
+
+STEP 5 – INVOKE_USECASE  
+• Controller deve chamar o UseCase correspondente com injeção de dependência.  
+• Não conter lógica de negócio — apenas transformação de request → UseCase.
+
+STEP 6 – RESPONSE_FORMAT  
+• Formatar saída conforme resource ou JSON configurado nos convenções do projeto.  
+• Incluir metadata padrão (ex.: `meta: ['status' => 'success']`) se aplicável.
+
+STEP 7 – DOC_GENERATION  
+• Gerar CONTROLLERS_<Module>.md em `docs/impl/controllers/`  
+com resumo das instruções e exemplos de request/response.
+
+STEP 8 – GIT_COMMIT  
+• `git add app/Http/Controllers/Api/V1/<Module> docs/impl/controllers/CONTROLLERS_<Module>.md`  
+• Commit: `feat(<Module>): controllers`
+
+EXPECTED_OUTPUT:  
+Markdown com os passos acima numerados, sem código-fonte, pronto para ser colado no prompt da fase controller.
+---
+description: Convenções de acesso a dados usando o padrão Repository
+globs:
+  - app/Domain/**/Interfaces/Repositories/**
+  - app/Infra/Repositories/**
+  - app/Infra/Providers/RepositoryServiceProvider.php
+alwaysApply: false
+---
+
+ACTION: REPOSITORY_IMPLEMENTATION
+
+STEP 1: DOMAIN CONTRACT
+
+- DEFINA uma interface de repositório em `Domain/<Modulo>/Interfaces/Repositories/`.
+- SIGA o padrão CRUD + queries específicas por contrato (ex.: `findByEmail`, `paginateByStatus`).
+- PREFIRA usar tipagem forte em métodos (ex.: DTOs, ValueObjects).
+- EVITE retornar Eloquent ou modelos acoplados.
+
+STEP 2: INFRA IMPLEMENTATION
+
+- IMPLEMENTE o contrato em `Infra/Repositories/Eloquent/<Modulo>Repository`.
+- EXTENDA `BaseRepository` se aplicável (ex.: paginate, TTL caching).
+- INJETAR os Models via construtor ou service locator.
+- USE o cache apenas em queries legíveis (getAll, paginate).
+
+STEP 3: BINDING
+
+- REGISTRE o vínculo contrato → implementação no `RepositoryServiceProvider`.
+- USE o método `bind()` com FQCNs, não strings mágicas.
+- GARANTA que o provider esteja listado em `config/app.php`.
+
+STEP 4: TTL (SE APLICÁVEL)
+
+- DEFINA constantes `TTL_*` para controlar cache em minutos.
+- USE tags de cache por módulo (ex.: `cache()->tags(['modulo'])`).
+
+EXPECTED_OUTPUT:
+
+Uma implementação desacoplada do padrão Repository, com binding explícito, suporte a TTL quando aplicável, consistência entre contrato e implementação, e alinhamento com os padrões da camada de domínio.
+
+Evite leaks de Eloquent no domínio. Prefira abstrações claras com foco em testabilidade e leitura.
+---
+description: Geração da camada UI (Blade + Vue + design tokens)
+globs: ["resources/js/modules/home/**", "resources/views/home/**", "resources/design/home.json"]
+alwaysApply: false
+---
+
+ACTION: UI_LAYER_IMPLEMENTATION
+
+STEP 1: DESIGN TOKEN LOAD
+- CARREGAR arquivo `resources/design/home.json`
+- MAPEAR tokens para cores, tipografia, espaçamentos, etc.
+- DEFINIR variantes (ex: primary, secondary, danger)
+- VALIDAR consistência com design system global
+
+STEP 2: COMPONENT CREATION (VUE)
+- CRIAR pasta `resources/js/modules/home/components/`
+- GERAR componentes Vue baseados nos tokens:
+  - Button.vue, Input.vue, Card.vue, etc.
+- DOCUMENTAR props e slots via JSDoc
+- TESTAR responsividade e dark-mode
+- APLICAR lazy-loading e Suspense quando necessário
+
+STEP 3: PAGE IMPLEMENTATION (VUE)
+- CRIAR arquivos de página em `resources/js/modules/home/pages/`
+- INCLUIR SEO tags com `<Head>`
+- ORGANIZAR layout usando Grid + Tailwind Utility Classes
+
+STEP 4: BLADE FALLBACK
+- CRIAR views SSR em `resources/views/home/`
+- UTILIZAR os mesmos tokens e semânticas visuais
+- EVITAR duplicação de lógica entre Blade e Vue
+
+STEP 5: UI INTEGRATION CHECK
+- VALIDAR integração com os UseCases e rotas mapeadas
+- TESTAR navegação, comportamento e consistência visual
+
+EXPECTED_OUTPUT:
+- UI modular e consistente, com base nos design tokens.
+- Componentes Vue documentados e responsivos.
+- Views Blade criadas como fallback SSR.
+- Integração total com fluxo de dados do módulo `home`.
+
+Comando git:
+git add resources/js/modules/home/ resources/views/home/ resources/design/home.json && \
+git commit -m "feat(home): UI layer implementation"
+
+description: Padrões para criação de UseCases em Application Layer
+globs: ["app/Application/**/UseCases/*.php"]
+alwaysApply: false
+---
+
+ACTION: USECASE_IMPLEMENTATION
+
+STEP 1: STRUCTURE_VALIDATION
+
+- ENSURE cada UseCase esteja em uma subpasta `app/Application/<Modulo>/UseCases/`.
+- ENSURE o nome siga padrão `Execute<Acao>UseCase`.
+
+STEP 2: CONSTRUCTOR_CONTRACTS
+
+- VALIDATE que todas as dependências no construtor sejam **contratos de interfaces**, nunca implementações concretas.
+- CHECK se bindings dessas interfaces existem nos Providers.
+
+STEP 3: METHOD_STANDARDIZATION
+
+- ENSURE o método principal seja `__invoke()` ou `handle()`.
+- IF método estiver ausente ⇒ SUGIRA criação padrão.
+
+STEP 4: DTO_COMPATIBILITY
+
+- CHECK se existe DTO correspondente em `Application/<Modulo>/DTOs/`.
+- IF faltando ⇒ SUGERIR `InputDTO` + `OutputDTO` com tipos fortes.
+
+STEP 5: QUERY_SEPARATION
+
+- IF operação for leitura pura ⇒ REDIRECIONAR para `Queries/` com retorno otimizado.
+- ENFORCE CQRS separation quando aplicável.
+
+STEP 6: TEST_CHECK
+
+- VALIDATE cobertura mínima de testes unitários em `tests/Unit/<Modulo>/`.
+
+---
+
+EXPECTED_OUTPUT:
+
+Um conjunto de UseCases com:
+
+- Nomenclatura padronizada.
+- Dependências desacopladas via contratos.
+- DTOs robustos e fortemente tipados.
+- Separação clara entre comando e consulta.
+- Cobertura de testes mínima garantida.
+
+------
+description: Invariantes de entidades, regras de enums e value objects do domínio
+globs:
+  - app/Domain/*/Entities/**
+  - app/Domain/*/ValueObjects/**
+  - app/Domain/*/Enums/**
+alwaysApply: false
+---
+
+ACTION: DOMAIN_RULE_VALIDATION
+
+STEP 1: ENTITY_INVARIANTS
+
+- VERIFIQUE se cada entidade aplica suas **invariantes de integridade** internamente (ex.: saldo não negativo, e-mail válido).
+- IMPEÇA mutabilidade em campos que representam identidade ou estado finalizado.
+- USE construtores estáticos se a criação direta comprometer validação (ex.: `Order::place()` ao invés de `new Order()`).
+- ASSEGURE consistência entre os métodos e os campos (ex.: `isPaid()` deve refletir o estado real da entidade).
+
+STEP 2: VALUE_OBJECTS
+
+- DEFINA **ValueObjects** imutáveis com validação rigorosa no construtor.
+- NÃO inclua lógica de negócio; apenas representação de valor (ex.: `Email`, `Money`, `Slug`).
+- IMPLEMENTE igualdade estrutural (`__toString()`, `equals()`) para facilitar comparação.
+
+STEP 3: ENUMS E STATUS
+
+- DEFINA enums com significado claro no contexto de domínio (ex.: `OrderStatus::PENDING`, `CANCELLED`).
+- NÃO use strings cruas no código — sempre use `Enum::case` nos campos e testes.
+- USE métodos utilitários se necessário (`isCancelable()`, `isFinalStatus()`).
+
+STEP 4: CONTRATOS DE DOMÍNIO
+
+- MANTENHA contratos de Repositories e Services separados da implementação.
+- USE interfaces em `Domain/<Modulo>/Interfaces` com assinatura limpa (sem dependência de framework).
+
+EXPECTED_OUTPUT:
+
+Entidades e ValueObjects com invariantes explícitas, enums semanticamente consistentes, e contratos desacoplados da infraestrutura.
+
+Evite lógica ambígua, campos flutuantes sem validação ou duplicação de regras de negócio fora do domínio.
+
+
+---
+description: "Define contratos e padrões para repositórios no módulo Home"
+globs:
+  - "app/Domain/Home/Interfaces/Repositories/**/*.php"
+  - "app/Infra/Repositories/Eloquent/Home/**/*.php"
+alwaysApply: false
+---
+
+ACTION: REPOSITORIES
+
+STEP 1 – CONTEXT_LOAD  
+• GARANTIR que `PROJECT_CONTEXT.md` e `docs/impl/repositories/REPOSITORIES_Home.md` estejam disponíveis ou serão gerados.  
+• VALIDAR que estamos no módulo `Home` (`module: Home`) e phase apropriada.
+
+STEP 2 – INTERFACE_CHECK  
+• VERIFICAR se existe interface de repositório em `Domain/Home/Interfaces/Repositories` (ex.: `HomeRepositoryInterface`).  
+• SE não existir → INSTRUÇÃO para criar uma interface com métodos CRUD e buscas específicas.
+
+STEP 3 – ELOQUENT_IMPL  
+• CRIAR implementação em `Infra/Repositories/Eloquent/Home/...` (ex.: `EloquentHomeRepository`).  
+• CERTIFICAR que usa injeção de dependência e segue contratos da interface.
+
+STEP 4 – PAGINATION_CACHING  
+• CHECAR padrões: todos os métodos pagináveis devem suportar `paginate()` e filtros.  
+• INSTRUÇÃO para implementar cache por TTL, se aplicável (ex.: Redis).
+
+STEP 5 – TEST_COVERAGE  
+• SUGERIR criação de teste de integração subterrâneo simulando CRUD e buscas.  
+• INSTRUÇÃO para preencher `docs/impl/repositories/REPOSITORIES_Home.md` com métodos, contratos, padrões, TTL e exemplos.
+
+STEP 6 – GIT_COMMIT  
+• `git add app/Domain/Home/Interfaces/Repositories app/Infra/Repositories/Eloquent/Home docs/impl/repositories/REPOSITORIES_Home.md`  
+• `git commit -m "feat(Home): repositories"`
+
+EXPECTED_OUTPUT:  
+Markdown com lista de steps numerados conforme acima, e bloco de commit detalhado, pronto para colar no agente da fase `repositories`.

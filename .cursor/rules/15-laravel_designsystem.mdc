@@ -1,0 +1,34 @@
+---
+description: Criação e padronização dos componentes base do Design System (Vue + Blade)
+globs:
+alwaysApply: false
+---
+
+ACTION: DESIGN_SYSTEM_COMPONENTS
+
+STEP 1: ANALYZE_REQUIREMENTS
+
+- READ design tokens from resources/design/<module>.json
+- IDENTIFY primary UI elements (buttons, inputs, alerts, modals, etc.)
+- DETERMINE variants and states (hover, focus, disabled, etc.)
+
+STEP 2: IMPLEMENT_COMPONENTS
+
+- CREATE Blade component stubs in resources/views/components/<module>/
+- CREATE Vue components in resources/js/components/<module>/
+- FOLLOW Tailwind utility-first styling and semantic markup
+- DOCUMENT props via JSDoc (Vue) or PHPDoc (Blade)
+
+STEP 3: DOCUMENTATION_AND_USAGE
+
+- GENERATE usage examples in stories or MD files
+- INCLUDE all expected variants in stories or preview pages
+- VALIDATE accessibility (a11y) for each component
+
+EXPECTED_OUTPUT:
+
+A complete and documented base Design System for <module>, with consistent naming, reusability, and accessible implementation in Vue and Blade.
+
+AVOID inconsistent naming, excessive abstractions, or framework-specific hacks.
+
+---

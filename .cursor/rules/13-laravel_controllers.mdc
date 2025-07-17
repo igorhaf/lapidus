@@ -1,0 +1,42 @@
+---
+description: Gera single-action Controllers e Resources seguindo padrões Laravel + Clean Architecture
+globs: ["app/Http/Controllers/Api/V1/**/*.php"]
+alwaysApply: false
+---
+
+ACTION: CONTROLLERS
+
+STEP 1 – CONTEXT_LOAD  
+• Ler `PROJECT_CONTEXT.md` para garantir alinhamento com stack, convenções e layout de diretórios.  
+• Validar que `phase: controllers` e `module: <Module>` estão corretos.
+
+STEP 2 – IDENTIFY_CONTROLLERS  
+• Verificar se há controllers para CRUD ou endpoints REST no módulo.  
+• Para cada caso de uso, identificar se será controller `__invoke`.
+
+STEP 3 – FORMREQUEST_INTEGRATION  
+• Garantir uso de FormRequest (ex.: `Store<Module>Request`, `Update<Module>Request`) para validação.  
+• Controller deve tipo-hint FormRequest no método `__invoke()`.
+
+STEP 4 – USECASE_CALL  
+• Injetar e chamar o UseCase correspondente (`Execute<Action>UseCase`).  
+• Mapear dados do FormRequest para o DTO e passar ao UseCase.
+
+STEP 5 – RESOURCE_RESPONSE  
+• Retornar resposta com `new <Module>Resource(...)` ou `ResourceCollection`.  
+• Seguir formato JSON consistente com API v1, incluindo status HTTP apropriado.
+
+STEP 6 – ERROR_HANDLING  
+• Capturar exceções específicas, retornar JSON com `status`, `message`, `errors`.  
+• Permitir propagação de validações padrão.
+
+STEP 7 – DOC_GENERATION  
+• Gerar `CONTROLLERS_<Module>.md` em `docs/impl/controllers/` usando template IMPLEMENTATION.  
+• Incluir resumo, rotas/arquivos envolvidos, exemplos de payloads, como testar.
+
+STEP 8 – GIT_COMMIT  
+• `git add app/Http/Controllers/Api/V1/<Module> docs/impl/controllers/CONTROLLERS_<Module>.md`  
+• `git commit -m "feat(<Module>): controllers"`
+
+EXPECTED_OUTPUT:  
+Markdown com as etapas acima numeradas, pronta para ser colada no chat da fase controllers.

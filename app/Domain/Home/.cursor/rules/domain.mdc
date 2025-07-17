@@ -1,0 +1,41 @@
+---
+description: Invariantes de entidades, regras de enums e value objects do domínio
+globs:
+  - app/Domain/*/Entities/**
+  - app/Domain/*/ValueObjects/**
+  - app/Domain/*/Enums/**
+alwaysApply: false
+---
+
+ACTION: DOMAIN_RULE_VALIDATION
+
+STEP 1: ENTITY_INVARIANTS
+
+- VERIFIQUE se cada entidade aplica suas **invariantes de integridade** internamente (ex.: saldo não negativo, e-mail válido).
+- IMPEÇA mutabilidade em campos que representam identidade ou estado finalizado.
+- USE construtores estáticos se a criação direta comprometer validação (ex.: `Order::place()` ao invés de `new Order()`).
+- ASSEGURE consistência entre os métodos e os campos (ex.: `isPaid()` deve refletir o estado real da entidade).
+
+STEP 2: VALUE_OBJECTS
+
+- DEFINA **ValueObjects** imutáveis com validação rigorosa no construtor.
+- NÃO inclua lógica de negócio; apenas representação de valor (ex.: `Email`, `Money`, `Slug`).
+- IMPLEMENTE igualdade estrutural (`__toString()`, `equals()`) para facilitar comparação.
+
+STEP 3: ENUMS E STATUS
+
+- DEFINA enums com significado claro no contexto de domínio (ex.: `OrderStatus::PENDING`, `CANCELLED`).
+- NÃO use strings cruas no código — sempre use `Enum::case` nos campos e testes.
+- USE métodos utilitários se necessário (`isCancelable()`, `isFinalStatus()`).
+
+STEP 4: CONTRATOS DE DOMÍNIO
+
+- MANTENHA contratos de Repositories e Services separados da implementação.
+- USE interfaces em `Domain/<Modulo>/Interfaces` com assinatura limpa (sem dependência de framework).
+
+EXPECTED_OUTPUT:
+
+Entidades e ValueObjects com invariantes explícitas, enums semanticamente consistentes, e contratos desacoplados da infraestrutura.
+
+Evite lógica ambígua, campos flutuantes sem validação ou duplicação de regras de negócio fora do domínio.
+
