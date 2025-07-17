@@ -8,10 +8,11 @@ use App\Domain\Home\Interfaces\Repositories\HomeRepositoryInterface;
 use App\Domain\Home\Actions\RecordPageViewAction;
 use App\Domain\Home\Actions\CalculatePageStatsAction;
 use App\Domain\Home\Services\PageAnalyticsService;
+use App\Infra\Gateways\AnalyticsServiceGateway;
+use App\Infra\Gateways\CacheServiceGateway;
 
 /**
- * UseCase para obter dados da página inicial
- * Usa Actions e Services da camada Domain
+ * UseCase para obter dados da página inicial usando gateways
  */
 class GetHomePageDataUseCase
 {
@@ -19,7 +20,9 @@ class GetHomePageDataUseCase
         private readonly HomeRepositoryInterface $homeRepository,
         private readonly RecordPageViewAction $recordPageViewAction,
         private readonly CalculatePageStatsAction $calculatePageStatsAction,
-        private readonly PageAnalyticsService $pageAnalyticsService
+        private readonly PageAnalyticsService $pageAnalyticsService,
+        private readonly AnalyticsServiceGateway $analyticsGateway,
+        private readonly CacheServiceGateway $cacheGateway
     ) {}
 
     public function __invoke(GetHomePageDataInputDTO $input): GetHomePageDataOutputDTO
@@ -34,11 +37,18 @@ class GetHomePageDataUseCase
         // Salvar no repositório
         $this->homeRepository->savePageView($pageView);
 
+        // Registrar no analytics via gateway
+        $this->analyticsGateway->trackPageView('/home', [
+            'user_id' => $input->userId,
+            'client_id' => $input->userIp,
+            'title' => 'Página Inicial',
+        ]);
+
         // Analisar a visualização
         $analytics = $this->pageAnalyticsService->analyzePageView($pageView);
 
-        // Calcular estatísticas
-        $stats = $this->calculatePageStatsAction->__invoke();
+        // Calcular estatísticas (usando cache via gateway)
+        $stats = $this->cacheGateway->getContactStats() ?? $this->calculatePageStatsAction->__invoke();
 
         // Retornar DTO de saída
         return new GetHomePageDataOutputDTO(
@@ -53,6 +63,7 @@ class GetHomePageDataUseCase
                 'analytics' => $analytics,
                 'stats' => $stats,
                 'page_view_id' => $pageView->getId()->getValue(),
+                'cached' => $this->cacheGateway->getContactStats() !== null,
             ]
         );
     }

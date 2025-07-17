@@ -8,12 +8,13 @@ use App\Application\Home\UseCases\SubmitContactFormUseCase;
 use App\Application\Home\DTOs\GetHomePageDataInputDTO;
 use App\Application\Home\DTOs\SubmitContactFormInputDTO;
 use App\Http\Requests\Home\ContactFormRequest;
+use App\Domain\Home\Entities\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 /**
  * Controller API para página inicial
- * Agora com suporte a formulário de contato
+ * Com autorização via Policies
  */
 class PaginaInicialController extends ApiController
 {
@@ -54,14 +55,17 @@ class PaginaInicialController extends ApiController
     public function submitContact(ContactFormRequest $request): JsonResponse
     {
         try {
+            // Autorização via Policy
+            $this->authorize('create', Contact::class);
+
             $inputDTO = SubmitContactFormInputDTO::fromRequest([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'subject' => $request->subject,
-                'message' => $request->message,
-                'preferred_contact' => $request->preferred_contact,
-                'newsletter' => $request->newsletter,
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
+                'phone' => $request->validated('phone'),
+                'subject' => $request->validated('subject'),
+                'message' => $request->validated('message'),
+                'preferred_contact' => $request->validated('preferred_contact'),
+                'newsletter' => $request->validated('newsletter'),
                 'user_ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);

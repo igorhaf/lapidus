@@ -2,24 +2,22 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\ViewComposers\HomePageComposer;
+use App\ViewComposers\ContactFormComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        Vite::prefetch(concurrency: 3);
+        // Registrar ViewComposers
+        View::composer('home.*', HomePageComposer::class);
+        View::composer('*contact*', ContactFormComposer::class);
     }
 }

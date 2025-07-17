@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Home;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\ValidPhoneNumber;
+use App\Rules\NotSpamMessage;
+use App\Rules\ValidPreferredContact;
 
 /**
  * FormRequest para validação do formulário de contato
@@ -11,7 +14,7 @@ class ContactFormRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Qualquer um pode enviar o formulário
+        return true;
     }
 
     public function rules(): array
@@ -19,10 +22,10 @@ class ContactFormRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', new ValidPhoneNumber],
             'subject' => ['required', 'string', 'max:200'],
-            'message' => ['required', 'string', 'max:1000'],
-            'preferred_contact' => ['nullable', 'in:email,phone,whatsapp'],
+            'message' => ['required', 'string', 'max:1000', new NotSpamMessage],
+            'preferred_contact' => ['nullable', new ValidPreferredContact],
             'newsletter' => ['boolean'],
         ];
     }
@@ -42,11 +45,10 @@ class ContactFormRequest extends FormRequest
 
     public function prepareForValidation(): void
     {
-        // Limpar e formatar dados antes da validação
         $this->merge([
             'name' => trim($this->name),
             'email' => strtolower(trim($this->email)),
-            'phone' => $this->phone ? preg_replace('/[^0-9+()-]/', '', $this->phone) : null,
+            'phone' => $this->phone ? trim($this->phone) : null,
             'subject' => trim($this->subject),
             'message' => trim($this->message),
             'newsletter' => (bool) $this->newsletter,
