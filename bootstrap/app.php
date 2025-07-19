@@ -1,5 +1,10 @@
 <?php
 
+// Desativar completamente o logging antes do Laravel ser carregado
+error_reporting(0);
+ini_set('log_errors', '0');
+ini_set('display_errors', '0');
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

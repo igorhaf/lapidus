@@ -1,11 +1,6 @@
 services:
     laravel.test:
-        build:
-            context: './vendor/laravel/sail/runtimes/8.4'
-            dockerfile: Dockerfile
-            args:
-                WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.4/app'
+        image: 'laravelsail/php82-composer'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -17,6 +12,21 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            PHP_MEMORY_LIMIT: '512M'
+            PHP_MAX_EXECUTION_TIME: '300'
+            PHP_MAX_INPUT_TIME: '300'
+            PHP_POST_MAX_SIZE: '100M'
+            PHP_UPLOAD_MAX_FILESIZE: '100M'
+            LOG_CHANNEL: 'errorlog'
+            LOG_STACK: 'errorlog'
+            LOG_LEVEL: 'error'
+            LOG_DEPRECATIONS_CHANNEL: 'null'
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+                reservations:
+                    memory: 512M
         volumes:
             - '.:/var/www/html'
         networks:
@@ -27,6 +37,7 @@ services:
             - meilisearch
             - mailpit
             - selenium
+        command: "bash -c 'cd /var/www/html && php -c /var/www/html/public/php.ini -S 0.0.0.0:80 -t public'"
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:

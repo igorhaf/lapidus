@@ -16,7 +16,7 @@ class InfrastructureServiceProvider extends ServiceProvider
         $this->app->register(GatewayServiceProvider::class);
         $this->app->register(CacheServiceProvider::class);
         $this->app->register(ExternalServiceProvider::class);
-        $this->app->register(MonitoringServiceProvider::class);
+        // $this->app->register(MonitoringServiceProvider::class); // NUNCA usar - gera logs enormes
 
         // Configurar configurações globais de infraestrutura
         $this->app->singleton('infrastructure.config', function ($app) {

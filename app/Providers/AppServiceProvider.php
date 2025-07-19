@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Registrar provider de infraestrutura
+        // Registrar provider de infraestrutura (sem monitoramento)
         $this->app->register(InfrastructureServiceProvider::class);
     }
 

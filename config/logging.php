@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => 'null',
 
     /*
     |--------------------------------------------------------------------------
@@ -61,8 +61,8 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'replace_placeholders' => true,
+            'level' => env('LOG_LEVEL', 'error'),
+            'replace_placeholders' => false,
         ],
 
         'daily' => [
@@ -114,13 +114,13 @@ return [
 
         'errorlog' => [
             'driver' => 'errorlog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'replace_placeholders' => true,
+            'level' => env('LOG_LEVEL', 'error'),
+            'replace_placeholders' => false,
         ],
 
         'null' => [
-            'driver' => 'monolog',
-            'handler' => NullHandler::class,
+            'driver' => 'errorlog',
+            'level' => 'emergency',
         ],
 
         'emergency' => [
