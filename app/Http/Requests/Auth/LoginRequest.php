@@ -87,6 +87,9 @@ class LoginRequest extends FormRequest
             $email = implode('', $email);
         }
         
-        return Str::transliterate(Str::lower($email).'|'.$this->ip());
+        // Converter para string e normalizar
+        $email = strtolower((string) $email);
+        
+        return $email . '|' . $this->ip();
     }
 }
