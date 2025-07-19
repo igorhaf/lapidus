@@ -2,22 +2,27 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Seeder principal do sistema
+ * Seguindo a arquitetura de domínio do projeto
+ */
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Executar os seeders na ordem correta
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seeders de usuários e autenticação
+        $this->call([
+            UserSeeder::class,
         ]);
+
+        // Seeders de módulos de domínio (quando implementados)
+        // $this->call([
+        //     HomeSeeder::class,
+        // ]);
     }
 }
