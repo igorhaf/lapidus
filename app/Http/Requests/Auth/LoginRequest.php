@@ -80,6 +80,13 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $email = $this->input('email');
+        
+        // Garantir que email seja uma string
+        if (is_array($email)) {
+            $email = implode('', $email);
+        }
+        
+        return Str::transliterate(Str::lower($email).'|'.$this->ip());
     }
 }
