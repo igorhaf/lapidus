@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('user_ip', 45);
             $table->text('user_agent')->nullable();
-            $table->enum('view_type', ['guest', 'authenticated'])->default('guest');
+            $table->enum('view_type', ['guest', 'registered', 'admin'])->default('guest');
             $table->timestamp('viewed_at');
             $table->json('metadata')->nullable(); // Para dados de analytics
             $table->timestamps();

@@ -7,7 +7,7 @@ use Inertia\Inertia;
 
 // Página inicial - renderizar através do módulo Home
 Route::get('/', function () {
-    return Inertia::render('modules/home/ui/index', [
+    return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,

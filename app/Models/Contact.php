@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Domain\Home\Enums\ContactStatus;
-use App\Database\Factories\ContactFactory;
+use Database\Factories\ContactFactory;
 
 /**
  * Model Eloquent para contatos do módulo Home

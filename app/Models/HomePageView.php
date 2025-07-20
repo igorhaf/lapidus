@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Domain\Home\Enums\PageViewType;
-use App\Database\Factories\HomePageViewFactory;
+use App\Domain\Home\Enums\UserType;
+use Database\Factories\HomePageViewFactory;
 
 /**
  * Model Eloquent para visualizações da página inicial
@@ -27,7 +27,7 @@ class HomePageView extends Model
     ];
 
     protected $casts = [
-        'view_type' => PageViewType::class,
+        'view_type' => UserType::class,
         'viewed_at' => 'datetime',
         'metadata' => 'array',
         'created_at' => 'datetime',
@@ -57,12 +57,12 @@ class HomePageView extends Model
     // Scopes
     public function scopeGuests($query)
     {
-        return $query->where('view_type', PageViewType::GUEST);
+        return $query->where('view_type', UserType::GUEST);
     }
 
     public function scopeAuthenticated($query)
     {
-        return $query->where('view_type', PageViewType::AUTHENTICATED);
+        return $query->where('view_type', UserType::REGISTERED);
     }
 
     public function scopeToday($query)

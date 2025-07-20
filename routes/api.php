@@ -11,7 +11,7 @@ RateLimiter::for('api', function ($request) {
     return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
 });
 
-Route::prefix('api/v1')
+Route::prefix('v1')
     ->middleware(['throttle:api'])
     ->group(function() {
         // GET - Dados da página inicial

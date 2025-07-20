@@ -27,7 +27,7 @@ class ContactFactory extends Factory
             'message' => fake('pt_BR')->paragraphs(2, true),
             'preferred_contact' => fake()->randomElement($preferredContacts),
             'newsletter' => fake()->boolean(30), // 30% chance de querer newsletter
-            'status' => fake()->randomElement(ContactStatus::cases()),
+            'status' => fake()->randomElement(['pending', 'read', 'responded', 'closed']),
             'user_ip' => fake()->ipv4(),
             'user_agent' => fake()->userAgent(),
         ];
@@ -55,7 +55,7 @@ class ContactFactory extends Factory
     public function responded(): static
     {
         return $this->state(fn () => [
-            'status' => ContactStatus::RESPONDED,
+            'status' => 'responded',
         ]);
     }
 
@@ -65,7 +65,7 @@ class ContactFactory extends Factory
     public function pending(): static
     {
         return $this->state(fn () => [
-            'status' => ContactStatus::PENDING,
+            'status' => 'pending',
         ]);
     }
 

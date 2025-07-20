@@ -23,7 +23,7 @@ class HomePageTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => 
-            $page->component('modules/home/ui/index')
+            $page->component('Welcome')
                  ->has('canLogin')
                  ->has('canRegister')
         );

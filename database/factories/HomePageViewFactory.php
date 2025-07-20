@@ -5,7 +5,6 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\HomePageView;
 use App\Models\User;
-use App\Domain\Home\Enums\PageViewType;
 
 /**
  * Factory para gerar dados de teste para visualizações da página
@@ -16,8 +15,8 @@ class HomePageViewFactory extends Factory
 
     public function definition(): array
     {
-        $viewType = fake()->randomElement(PageViewType::cases());
-        $userId = $viewType === PageViewType::AUTHENTICATED 
+        $viewType = fake()->randomElement(['guest', 'registered']);
+        $userId = $viewType === 'registered' 
             ? User::factory()->create()->id 
             : null;
 
@@ -51,7 +50,7 @@ class HomePageViewFactory extends Factory
     {
         return $this->state(fn () => [
             'user_id' => null,
-            'view_type' => PageViewType::GUEST,
+            'view_type' => 'guest',
         ]);
     }
 
@@ -62,7 +61,7 @@ class HomePageViewFactory extends Factory
     {
         return $this->state(fn () => [
             'user_id' => User::factory()->create()->id,
-            'view_type' => PageViewType::AUTHENTICATED,
+            'view_type' => 'registered',
         ]);
     }
 

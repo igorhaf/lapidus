@@ -55,6 +55,16 @@ class HomePageView
         return $this->userId->isGuest();
     }
 
+    public function getViewType(): string
+    {
+        return $this->userId->getValue() > 0 ? 'registered' : 'guest';
+    }
+
+    public function isGuest(): bool
+    {
+        return $this->userId->getValue() === 0;
+    }
+
     public static function create(
         int $userId,
         ?string $userIp = null,
