@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-        // Seeders de módulos de domínio (quando implementados)
-        // $this->call([
-        //     HomeSeeder::class,
-        // ]);
+        // Seeders de módulos de domínio
+        $this->call([
+            HomeSeeder::class,
+        ]);
     }
 }

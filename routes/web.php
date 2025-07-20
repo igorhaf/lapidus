@@ -5,8 +5,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Página inicial - renderizar através do módulo Home
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('modules/home/ui/index', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
