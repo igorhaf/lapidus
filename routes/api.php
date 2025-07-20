@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -19,3 +20,9 @@ Route::prefix('api/v1')
         // POST - Enviar formulário de contato
         Route::post('pagina-inicial/contact', [PaginaInicialController::class, 'submitContact']);
     });
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+
