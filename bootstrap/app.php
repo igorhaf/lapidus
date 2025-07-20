@@ -1,9 +1,9 @@
 <?php
 
-// Desativar completamente o logging antes do Laravel ser carregado
-error_reporting(0);
-ini_set('log_errors', '0');
-ini_set('display_errors', '0');
+// Configuração de logging para desenvolvimento
+error_reporting(E_ALL);
+ini_set('log_errors', '1');
+ini_set('display_errors', '0'); // Manter display_errors desabilitado em produção
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;

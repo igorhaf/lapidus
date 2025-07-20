@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'default' => 'null',
+    'default' => env('LOG_CHANNEL', 'null'),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => ['single'],
             'ignore_exceptions' => false,
         ],
 
@@ -92,6 +92,11 @@ return [
                 'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
         ],
 
         'stderr' => [
