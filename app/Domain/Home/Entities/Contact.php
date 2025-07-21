@@ -91,7 +91,7 @@ class Contact
 
     public function isUrgent(): bool
     {
-        $urgentKeywords = ['urgente', 'emergência', 'critico', 'crítico', 'problema'];
+        $urgentKeywords = ['urgente', 'emergência', 'critico', 'crítico', 'critica', 'crítica', 'problema'];
         $message = strtolower($this->message);
         
         foreach ($urgentKeywords as $keyword) {

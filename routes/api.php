@@ -12,8 +12,12 @@ RateLimiter::for('api', function ($request) {
 });
 
 Route::prefix('v1')
-    ->middleware(['throttle:api'])
     ->group(function() {
+        // Teste simples
+        Route::get('test', function() {
+            return response()->json(['status' => 'API funcionando']);
+        });
+        
         // GET - Dados da página inicial
         Route::get('pagina-inicial', [PaginaInicialController::class, 'index']);
         

@@ -27,11 +27,14 @@ class SendContactNotification implements ShouldQueue
     {
         try {
             // Enviar e-mail de notificação
-            $this->emailGateway->sendContactNotification(
-                $event->contactId,
-                $event->email,
-                $event->isUrgent
-            );
+            $this->emailGateway->sendContactNotification([
+                'contact_id' => $event->contactId,
+                'email' => $event->email,
+                'is_urgent' => $event->isUrgent,
+                'name' => $event->name ?? 'Não informado',
+                'subject' => $event->subject ?? 'Novo contato',
+                'message' => $event->message ?? 'Sem mensagem'
+            ]);
 
             // Se for urgente, enviar SMS também
             if ($event->isUrgent) {

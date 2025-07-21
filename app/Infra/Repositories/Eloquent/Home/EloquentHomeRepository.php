@@ -36,7 +36,7 @@ class EloquentHomeRepository implements HomeRepositoryInterface
                 'view_id' => $pageView->getId()->getValue(),
                 'user_id' => $pageView->getUserId()?->getValue(),
                 'user_ip' => $pageView->getUserIp(),
-                'view_type' => $pageView->getViewType()->value,
+                'view_type' => $pageView->getViewType(),
             ]);
 
             // Invalidar cache de estatísticas

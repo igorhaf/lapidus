@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'null'),
+    'default' => 'single',
 
     /*
     |--------------------------------------------------------------------------
@@ -32,8 +32,8 @@ return [
     */
 
     'deprecations' => [
-        'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
-        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
+        'channel' => 'null',
+        'trace' => false,
     ],
 
     /*
@@ -46,7 +46,7 @@ return [
     | of powerful log handlers and formatters that you're free to use.
     |
     | Available drivers: "single", "daily", "slack", "syslog",
-    |                    "errorlog", "monolog", "custom", "stack"
+    |                    "monolog", "custom", "stack"
     |
     */
 
@@ -61,8 +61,17 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'error'),
-            'replace_placeholders' => false,
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
+
+        'null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
         ],
 
         'daily' => [
@@ -94,19 +103,14 @@ return [
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
-        'null' => [
-            'driver' => 'monolog',
-            'handler' => NullHandler::class,
-        ],
-
         'stderr' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
-            'handler_with' => [
+            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
@@ -117,20 +121,8 @@ return [
             'replace_placeholders' => true,
         ],
 
-        'errorlog' => [
-            'driver' => 'errorlog',
-            'level' => env('LOG_LEVEL', 'error'),
-            'replace_placeholders' => false,
-        ],
-
-        'null' => [
-            'driver' => 'errorlog',
-            'level' => 'emergency',
-        ],
-
-        'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
-        ],
+        // REMOVIDO: 'errorlog' channel que causava problema
+        // Substituído por configurações mais robustas
 
     ],
 

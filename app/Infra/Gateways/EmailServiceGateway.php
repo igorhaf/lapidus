@@ -7,75 +7,70 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Gateway base para serviços externos
+ * Gateway para serviços de e-mail
  */
-abstract class BaseGateway
+class EmailServiceGateway extends BaseGateway
 {
-    protected string $baseUrl;
-    protected array $headers = [];
-    protected int $timeout = 30;
-    protected int $retries = 3;
-
-    public function __construct()
+    protected function initializeConfig(): void
     {
-        $this->initializeConfig();
+        $this->baseUrl = config('services.email.base_url', 'https://api.example-email.com');
+        $this->headers = [
+            'Authorization' => 'Bearer ' . config('services.email.api_key'),
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+        $this->timeout = config('services.email.timeout', 30);
+        $this->retries = config('services.email.retries', 3);
     }
 
     /**
-     * Inicializar configurações específicas do gateway
+     * Enviar e-mail
      */
-    abstract protected function initializeConfig(): void;
-
-    /**
-     * Fazer requisição HTTP com retry
-     */
-    protected function makeRequest(string $method, string $endpoint, array $data = []): array
+    public function sendEmail(array $emailData): array
     {
-        $attempts = 0;
-        
-        while ($attempts < $this->retries) {
-            try {
-                $response = Http::timeout($this->timeout)
-                    ->withHeaders($this->headers)
-                    ->$method($this->baseUrl . $endpoint, $data);
-
-                if ($response->successful()) {
-                    return $response->json();
-                }
-
-                Log::warning("Gateway request failed", [
-                    'gateway' => static::class,
-                    'endpoint' => $endpoint,
-                    'status' => $response->status(),
-                    'attempt' => $attempts + 1,
-                ]);
-
-            } catch (\Exception $e) {
-                Log::error("Gateway request exception", [
-                    'gateway' => static::class,
-                    'endpoint' => $endpoint,
-                    'error' => $e->getMessage(),
-                    'attempt' => $attempts + 1,
-                ]);
-            }
-
-            $attempts++;
-            
-            if ($attempts < $this->retries) {
-                sleep(pow(2, $attempts)); // Exponential backoff
-            }
+        try {
+            return $this->makeRequest('post', '/send', $emailData);
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar email', [
+                'error' => $e->getMessage(),
+                'email_data' => $emailData
+            ]);
+            throw $e;
         }
-
-        throw new \Exception("Gateway request failed after {$this->retries} attempts");
     }
 
     /**
-     * Cache com TTL específico do gateway
+     * Verificar status de envio
      */
-    protected function cache(string $key, callable $callback, int $ttl = 300): mixed
+    public function getStatus(string $messageId): array
     {
-        $cacheKey = static::class . ':' . $key;
-        
-        return Cache::remember($cacheKey, $ttl, $callback);
+        return $this->cache("status:{$messageId}", function () use ($messageId) {
+            return $this->makeRequest('get', "/status/{$messageId}");
+        }, 60);
+    }
+
+    /**
+     * Listar templates disponíveis
+     */
+    public function getTemplates(): array
+    {
+        return $this->cache('templates', function () {
+            return $this->makeRequest('get', '/templates');
+        }, 3600);
+    }
+
+    /**
+     * Enviar notificação de novo contato
+     */
+    public function sendContactNotification(array $contactData): array
+    {
+        $emailData = [
+            'to' => config('mail.admin_email', 'admin@example.com'),
+            'subject' => 'Novo contato recebido',
+            'template' => 'contact_notification',
+            'variables' => $contactData
+        ];
+
+        return $this->sendEmail($emailData);
     }
 } 

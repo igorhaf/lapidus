@@ -37,12 +37,17 @@ class GetHomePageDataUseCase
         // Salvar no repositório
         $this->homeRepository->savePageView($pageView);
 
-        // Registrar no analytics via gateway
-        $this->analyticsGateway->trackPageView('/home', [
-            'user_id' => $input->userId,
-            'client_id' => $input->userIp,
-            'title' => 'Página Inicial',
-        ]);
+        // Registrar no analytics via gateway (não crítico)
+        try {
+            $this->analyticsGateway->trackPageView('/home', [
+                'user_id' => $input->userId,
+                'client_id' => $input->userIp,
+                'title' => 'Página Inicial',
+            ]);
+        } catch (\Exception $e) {
+            // Analytics falhou, mas não é crítico - apenas loggar
+            \Log::info('Analytics falhou, mas não é crítico', ['error' => $e->getMessage()]);
+        }
 
         // Analisar a visualização
         $analytics = $this->pageAnalyticsService->analyzePageView($pageView);

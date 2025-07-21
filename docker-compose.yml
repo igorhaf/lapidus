@@ -1,6 +1,11 @@
 services:
     laravel.test:
-        image: 'laravelsail/php82-composer'
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.2
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: sail-8.2/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -12,21 +17,6 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
-            PHP_MEMORY_LIMIT: '512M'
-            PHP_MAX_EXECUTION_TIME: '300'
-            PHP_MAX_INPUT_TIME: '300'
-            PHP_POST_MAX_SIZE: '100M'
-            PHP_UPLOAD_MAX_FILESIZE: '100M'
-            LOG_CHANNEL: 'errorlog'
-            LOG_STACK: 'errorlog'
-            LOG_LEVEL: 'error'
-            LOG_DEPRECATIONS_CHANNEL: 'null'
-        deploy:
-            resources:
-                limits:
-                    memory: 1G
-                reservations:
-                    memory: 512M
         volumes:
             - '.:/var/www/html'
         networks:
@@ -37,7 +27,6 @@ services:
             - meilisearch
             - mailpit
             - selenium
-        command: "bash -c 'cd /var/www/html && php -c /var/www/html/public/php.ini -S 0.0.0.0:80 -t public'"
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -51,7 +40,7 @@ services:
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
             - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - './vendor/laravel/sail/database/mysql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
         healthcheck:
@@ -81,8 +70,6 @@ services:
         image: 'getmeili/meilisearch:latest'
         ports:
             - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
-        environment:
-            MEILI_NO_ANALYTICS: '${MEILISEARCH_NO_ANALYTICS:-false}'
         volumes:
             - 'sail-meilisearch:/meili_data'
         networks:
@@ -93,7 +80,7 @@ services:
                 - wget
                 - '--no-verbose'
                 - '--spider'
-                - 'http://127.0.0.1:7700/health'
+                - 'http://localhost:7700/health'
             retries: 3
             timeout: 5s
     mailpit:

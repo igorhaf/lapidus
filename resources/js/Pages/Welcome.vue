@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
@@ -10,13 +10,25 @@ defineProps({
     },
     laravelVersion: {
         type: String,
-        required: true,
     },
     phpVersion: {
         type: String,
-        required: true,
+    },
+    customMessage: {
+        type: String,
+    },
+    homeStats: {
+        type: Object,
+    },
+    user: {
+        type: Object,
     },
 });
+
+// Debug - para verificar se os props estão chegando
+console.log('Props recebidas:', props);
+console.log('customMessage:', props.customMessage);
+console.log('homeStats:', props.homeStats);
 
 function handleImageError() {
     document.getElementById('screenshot-container')?.classList.add('!hidden');
@@ -81,6 +93,81 @@ function handleImageError() {
                         </template>
                     </nav>
                 </header>
+
+                <!-- Seção do Módulo Home - TOPO DA PÁGINA -->
+                <div class="py-8 mb-8">
+                    <div class="max-w-2xl mx-auto text-center">
+                        <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border-2 border-[#FF2D20]">
+                            <h2 class="text-3xl font-bold text-[#FF2D20] mb-4">
+                                🏠 LAPIDUS - Módulo Home Ativo!
+                            </h2>
+                            
+                            <p v-if="customMessage" class="text-lg text-gray-700 dark:text-gray-300 mb-6 bg-green-100 dark:bg-green-900/30 p-4 rounded-lg">
+                                ✅ {{ customMessage }}
+                            </p>
+                            <p v-else class="text-lg text-gray-700 dark:text-gray-300 mb-6 bg-yellow-100 dark:bg-yellow-900/30 p-4 rounded-lg">
+                                🚀 Página inicial customizada - Controller HomeController ativo!
+                            </p>
+
+                            <div v-if="user" class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                <p class="text-blue-800 dark:text-blue-300 text-lg">
+                                    👋 <strong>Bem-vindo, {{ user.name }}!</strong> 
+                                    <br><small>({{ user.email }})</small>
+                                </p>
+                            </div>
+                            <div v-else class="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                <p class="text-gray-700 dark:text-gray-300">
+                                    👤 <strong>Visitante Anônimo</strong> - 
+                                    <Link v-if="canLogin" href="/login" class="text-[#FF2D20] hover:underline font-semibold">
+                                        Faça Login
+                                    </Link>
+                                </p>
+                            </div>
+
+                            <div v-if="homeStats" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                                <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center border border-blue-200">
+                                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                                        {{ homeStats.total_views }}
+                                    </div>
+                                    <div class="text-sm text-blue-800 dark:text-blue-300 font-medium">Total Views</div>
+                                </div>
+                                
+                                <div class="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 text-center border border-green-200">
+                                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                                        {{ homeStats.unique_visitors }}
+                                    </div>
+                                    <div class="text-sm text-green-800 dark:text-green-300 font-medium">Visitors</div>
+                                </div>
+                                
+                                <div class="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 text-center border border-purple-200">
+                                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                                        {{ homeStats.recent_views }}
+                                    </div>
+                                    <div class="text-sm text-purple-800 dark:text-purple-300 font-medium">Recent</div>
+                                </div>
+                                
+                                <div class="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 text-center border border-orange-200">
+                                    <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                                        {{ homeStats.bounce_rate }}
+                                    </div>
+                                    <div class="text-sm text-orange-800 dark:text-orange-300 font-medium">Bounce Rate</div>
+                                </div>
+                            </div>
+
+                            <div class="text-sm text-white bg-[#FF2D20] px-4 py-2 rounded-full font-semibold">
+                                🎯 Clean Architecture • DDD • API REST • Vue + Inertia
+                            </div>
+
+                            <!-- Debug info -->
+                            <div class="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-xs text-left">
+                                <strong>Debug Info:</strong><br>
+                                customMessage: {{ customMessage || 'undefined' }}<br>
+                                homeStats: {{ homeStats ? JSON.stringify(homeStats) : 'undefined' }}<br>
+                                user: {{ user ? user.name + ' (' + user.email + ')' : 'null' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <main class="mt-6">
                     <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
@@ -378,7 +465,7 @@ function handleImageError() {
                 <footer
                     class="py-16 text-center text-sm text-black dark:text-white/70"
                 >
-                    Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
+                    Laravel v{{ laravelVersion || 'N/A' }} (PHP v{{ phpVersion || 'N/A' }})
                 </footer>
             </div>
         </div>

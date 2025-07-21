@@ -50,11 +50,6 @@ class HomePageView
         return $this->userAgent;
     }
 
-    public function isGuest(): bool
-    {
-        return $this->userId->isGuest();
-    }
-
     public function getViewType(): string
     {
         return $this->userId->getValue() > 0 ? 'registered' : 'guest';
